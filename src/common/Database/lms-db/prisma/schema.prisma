@@ -1,0 +1,16 @@
+// This is your Prisma LMS (Learning Management System) schema file,
+// You can change the attributes or tables according to your needs. 
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/lms-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("LMS_DATABASE_URL")
+}
+
+// Enum DataType
+
+// Model

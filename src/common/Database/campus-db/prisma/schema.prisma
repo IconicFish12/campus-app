@@ -1,0 +1,303 @@
+// This is your Prisma Campus schema file,
+// You can change the attributes or tables according to your needs. 
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/campus-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("CAMPUS_DATABASE_URL")
+}
+
+// Enum DataType
+
+enum Gender {
+  LAKI
+  PEREMPUAN
+  LAINYA
+}
+
+enum Status {
+  AKTIF
+  TIDAK_AKTIF
+  SUSPANDED
+}
+
+enum Offer {
+  GANJIL
+  GENAP
+  PENDEK
+}
+
+enum SemesterName {
+  GANJIL
+  GENAP
+  PENDEK
+}
+
+enum StudentStatus {
+  AKTIF
+  CUTI
+  DROPOUT
+  TIDAK_AKTIF
+  LULUS
+}
+
+enum EmploymentStatus {
+  FULL_TIME
+  PART_TIME
+  VISSTING
+}
+
+enum AcademicRank {
+  ASSISTANT_PROFESSOR
+  ASSOCIATE_PROFESSOR
+  PROFESSOR
+  LECTURER
+}
+
+enum ProgramLevel {
+  D3
+  S1
+  S2
+  S3
+}
+
+enum DayOfWeek {
+  SENIN
+  SELASA
+  RABU
+  KAMIS
+  JUMAT
+  SABTU
+  MINGGU
+}
+
+enum ClassScheduleStatus {
+  AKTIF
+  TUNDA
+  PENUH
+}
+
+enum StudentEnrollmentStatus {
+  TERDAFTAR
+  DIHAPUS
+  SELESAI
+}
+
+// Model
+
+model User {
+  id              String      @id @default(uuid()) @db.Uuid
+  email           String      @unique @map("email")
+  firstName       String      @map("firt_name")
+  lastName        String      @map("last_name")
+  middleName      String?     @map("middle_name")
+  gender          Gender
+  addressId       String?     @unique @map("addressId") @db.Uuid
+  address         Address?    @relation(fields: [addressId], references: [id])
+  status          Status      @default(AKTIF)
+  profile_picture String?     @map("profile_picture")
+  isVerified      Boolean     @default(false) @map("is_verified")
+  created_at      DateTime    @default(now()) @map("created_at")
+  updated_at      DateTime    @updatedAt @map("updated_at")
+  lecturers       Lecturers?
+  Student         Student?
+  User_roles      UserRoles[]
+
+  @@map("users")
+}
+
+model Address {
+  id          String  @id @default(uuid()) @db.Uuid
+  User        User?
+  fullAddress String  @map("fullAddress")
+  cityId      String  @map("city_id") @db.Uuid
+  postalCode  Int?    @unique @map("postalCode")
+  stateId     String? @map("state_id") @db.Uuid
+  countryId   String? @map("country_id") @db.Uuid
+
+  @@map("address")
+}
+
+model Roles {
+  id          String      @id @default(uuid()) @db.Uuid
+  name        String      @map("roles_name")
+  description String?     @map("description")
+  created_at  DateTime    @default(now()) @map("created_at")
+  updated_at  DateTime    @updatedAt @map("updated_at")
+  userRoles   UserRoles[]
+
+  @@map("roles")
+}
+
+model UserRoles {
+  userId String @default(uuid()) @db.Uuid
+  roleId String @default(uuid()) @db.Uuid
+  user   User   @relation(fields: [userId], references: [id])
+  role   Roles  @relation(fields: [roleId], references: [id])
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+
+model Departments {
+  id          String     @id @default(uuid()) @db.Uuid
+  name        String     @unique @map("departement_name")
+  code        String     @unique @map("departement_code")
+  description String?    @map("description")
+  program     Programs[]
+  created_at  DateTime   @default(now()) @map("created_at")
+  updated_at  DateTime   @updatedAt @map("updated_at")
+  Lecturers   Lecturers?
+
+  @@map("departments")
+}
+
+model Programs {
+  id           String       @id @default(uuid()) @db.Uuid
+  name         String       @unique @map("program_name")
+  code         String       @unique @map("program_code")
+  level        ProgramLevel @map("program_level")
+  departmentId String       @db.Uuid
+  department   Departments  @relation(fields: [departmentId], references: [id])
+  courses      Courses[]
+  created_at   DateTime     @default(now()) @map("created_at")
+  updated_at   DateTime     @updatedAt @map("updated_at")
+  Student      Student?
+
+  @@map("progams")
+}
+
+model Courses {
+  id               String          @id @default(uuid()) @db.Uuid
+  name             String          @unique @map("course_name")
+  code             String          @unique @map("course_code")
+  credits          Float           @map("course_credit")
+  programId        String          @map("program_id") @db.Uuid
+  program          Programs        @relation(fields: [programId], references: [id])
+  prerequisites    Json            @map("prerequisites")
+  semester_offered Offer?          @map("semester_offered")
+  created_at       DateTime        @default(now()) @map("created_at")
+  updated_at       DateTime        @updatedAt @map("updated_at")
+  ClassSchedule    ClassSchedule[]
+
+  @@map("courses")
+}
+
+model Lecturers {
+  userId           String           @id @map("user_id") @db.Uuid
+  user             User             @relation(fields: [userId], references: [id])
+  nidn             String?
+  academicRank     AcademicRank?    @map("academic_rank")
+  departmentId     String           @unique @map("department_id") @db.Uuid
+  departement      Departments?     @relation(fields: [departmentId], references: [id])
+  employmentStatus EmploymentStatus @map("employment_status")
+  specializations  Json?
+  hireDate         DateTime         @map("hire_date")
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+  ClassSchedule    ClassSchedule[]
+
+  @@map("lecturers")
+}
+
+model Student {
+  userId            String              @id @map("user_id") @db.Uuid
+  user              User                @relation(fields: [userId], references: [id])
+  nim               String              @unique
+  programId         String              @unique @map("program_id") @db.Uuid
+  program           Programs?           @relation(fields: [programId], references: [id])
+  enrollmentYear    Int                 @map("enrollment_year")
+  currentSemester   Int                 @map("current_semester")
+  academicStatus    StudentStatus       @default(AKTIF) @map("academic_status")
+  gpa               Float?
+  admissionType     String?             @map("admission_type")
+  createdAt         DateTime            @default(now()) @map("created_at")
+  updatedAt         DateTime            @updatedAt @map("updated_at")
+  StudentEnrollment StudentEnrollment[]
+
+  @@map("students")
+}
+
+// 9. AcademicYear Table (Tahun Akademik)
+model AcademicYear {
+  id        String   @id @default(uuid()) @map("id") @db.Uuid
+  year      String   @unique
+  startDate DateTime @map("start_date") @db.Date
+  endDate   DateTime @map("end_date") @db.Date
+  isCurrent Boolean  @default(false) @map("is_current")
+
+  semesters Semester[] // Relasi ke Semester
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("academic_years")
+}
+
+// 10. Semester Table (Semester)
+model Semester {
+  id                       String       @id @default(uuid()) @map("id") @db.Uuid
+  academicYearId           String       @map("academic_year_id") @db.Uuid
+  academicYear             AcademicYear @relation(fields: [academicYearId], references: [id])
+  name                     SemesterName
+  startDate                DateTime     @map("start_date") @db.Date
+  endDate                  DateTime     @map("end_date") @db.Date
+  registrationStartDate    DateTime?    @map("registration_start_date") @db.Date
+  registrationEndDate      DateTime?    @map("registration_end_date") @db.Date
+  gradesSubmissionDeadline DateTime?    @map("grades_submission_deadline") @db.Date
+
+  classSchedules ClassSchedule[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("semesters")
+}
+
+// 11. ClassSchedule Table (Jadwal Kelas)
+model ClassSchedule {
+  id                    String              @id @default(uuid()) @map("id") @db.Uuid
+  courseId              String              @map("course_id") @db.Uuid // FK ke Course
+  course                Courses             @relation(fields: [courseId], references: [id])
+  semesterId            String              @map("semester_id") @db.Uuid // FK ke Semester
+  semester              Semester            @relation(fields: [semesterId], references: [id])
+  lecturerId            String              @map("lecturer_id") @db.Uuid // FK ke Lecturer.userId
+  lecturer              Lecturers           @relation(fields: [lecturerId], references: [userId])
+  classCode             String              @unique @map("class_code")
+  roomNumber            String?             @map("room_number")
+  dayOfWeek             DayOfWeek           @map("day_of_week")
+  startTime             DateTime            @map("start_time") @db.Time(3)
+  endTime               DateTime            @map("end_time") @db.Time(3)
+  capacity              Int
+  enrolledStudentsCount Int                 @default(0) @map("enrolled_students_count")
+  status                ClassScheduleStatus @default(AKTIF)
+
+  studentEnrollments StudentEnrollment[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("class_schedules")
+}
+
+// 12. StudentEnrollment Table (Pendaftaran Mahasiswa ke Kelas)
+model StudentEnrollment {
+  studentId        String                  @map("student_id") @db.Uuid
+  student          Student                 @relation(fields: [studentId], references: [userId])
+  classScheduleId  String                  @map("class_schedule_id") @db.Uuid
+  classSchedule    ClassSchedule           @relation(fields: [classScheduleId], references: [id])
+  enrollmentDate   DateTime                @default(now()) @map("enrollment_date")
+  status           StudentEnrollmentStatus @default(TERDAFTAR)
+  finalGradeLetter String?                 @map("final_grade_letter")
+  finalGradeScore  Float?                  @map("final_grade_score")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@id([studentId, classScheduleId]) // Primary Key Gabungan
+  @@map("student_enrollments")
+}

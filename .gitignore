@@ -42,6 +42,11 @@ lerna-debug.log*
 .env.production.local
 .env.local
 
+# prismaORM
+/src/common/Database/campus-db/generated/campus-client
+/src/common/Database/lms-db/generated/lms-client
+
+
 # temp directory
 .temp
 .tmp
