@@ -1,17 +1,17 @@
 -- CreateEnum
-CREATE TYPE "Gender" AS ENUM ('LAKI', 'PEREMPUAN', 'LAINYA');
+CREATE TYPE "Gender" AS ENUM ('MALE', 'FEMALE', 'OTHER');
 
 -- CreateEnum
-CREATE TYPE "Status" AS ENUM ('AKTIF', 'TIDAK_AKTIF', 'SUSPANDED');
+CREATE TYPE "Status" AS ENUM ('ACTIVE', 'INACTIVE', 'SUSPANDED');
 
 -- CreateEnum
-CREATE TYPE "Offer" AS ENUM ('GANJIL', 'GENAP', 'PENDEK');
+CREATE TYPE "Offer" AS ENUM ('ODD', 'EVEN', 'SHORT');
 
 -- CreateEnum
-CREATE TYPE "SemesterName" AS ENUM ('GANJIL', 'GENAP', 'PENDEK');
+CREATE TYPE "SemesterName" AS ENUM ('ODD', 'EVEN', 'SHORT');
 
 -- CreateEnum
-CREATE TYPE "StudentStatus" AS ENUM ('AKTIF', 'CUTI', 'DROPOUT', 'TIDAK_AKTIF', 'LULUS');
+CREATE TYPE "StudentStatus" AS ENUM ('ACTIVE', 'ON_LEAVE', 'DROPOUT', 'INACTIVE', 'GRADUATING');
 
 -- CreateEnum
 CREATE TYPE "EmploymentStatus" AS ENUM ('FULL_TIME', 'PART_TIME', 'VISSTING');
@@ -20,16 +20,16 @@ CREATE TYPE "EmploymentStatus" AS ENUM ('FULL_TIME', 'PART_TIME', 'VISSTING');
 CREATE TYPE "AcademicRank" AS ENUM ('ASSISTANT_PROFESSOR', 'ASSOCIATE_PROFESSOR', 'PROFESSOR', 'LECTURER');
 
 -- CreateEnum
-CREATE TYPE "ProgramLevel" AS ENUM ('D3', 'S1', 'S2', 'S3');
+CREATE TYPE "ProgramLevel" AS ENUM ('D3', 'BACHELOR', 'MASTER', 'DOCTOR');
 
 -- CreateEnum
-CREATE TYPE "DayOfWeek" AS ENUM ('SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU', 'MINGGU');
+CREATE TYPE "DayOfWeek" AS ENUM ('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY');
 
 -- CreateEnum
-CREATE TYPE "ClassScheduleStatus" AS ENUM ('AKTIF', 'TUNDA', 'PENUH');
+CREATE TYPE "ClassScheduleStatus" AS ENUM ('ACTIVE', 'DELAY', 'CANCELLED', 'PENUH');
 
 -- CreateEnum
-CREATE TYPE "StudentEnrollmentStatus" AS ENUM ('TERDAFTAR', 'DIHAPUS', 'SELESAI');
+CREATE TYPE "StudentEnrollmentStatus" AS ENUM ('ENROLLED', 'DROPPED', 'COMPLETED');
 
 -- CreateTable
 CREATE TABLE "users" (
@@ -40,7 +40,7 @@ CREATE TABLE "users" (
     "middle_name" TEXT,
     "gender" "Gender" NOT NULL,
     "addressId" UUID,
-    "status" "Status" NOT NULL DEFAULT 'AKTIF',
+    "status" "Status" NOT NULL DEFAULT 'ACTIVE',
     "profile_picture" TEXT,
     "is_verified" BOOLEAN NOT NULL DEFAULT false,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -50,15 +50,45 @@ CREATE TABLE "users" (
 );
 
 -- CreateTable
-CREATE TABLE "address" (
+CREATE TABLE "addresses" (
     "id" UUID NOT NULL,
-    "fullAddress" TEXT NOT NULL,
-    "city_id" UUID NOT NULL,
-    "postalCode" INTEGER,
-    "state_id" UUID,
+    "full_address" TEXT NOT NULL,
     "country_id" UUID,
+    "postal_code" INTEGER,
 
-    CONSTRAINT "address_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "addresses_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "cities" (
+    "id" UUID NOT NULL,
+    "state_id" UUID NOT NULL,
+    "city_name" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "cities_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "states" (
+    "id" UUID NOT NULL,
+    "country_id" UUID NOT NULL,
+    "state_name" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "states_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "countries" (
+    "id" UUID NOT NULL,
+    "country_name" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "countries_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -142,7 +172,7 @@ CREATE TABLE "students" (
     "program_id" UUID NOT NULL,
     "enrollment_year" INTEGER NOT NULL,
     "current_semester" INTEGER NOT NULL,
-    "academic_status" "StudentStatus" NOT NULL DEFAULT 'AKTIF',
+    "academic_status" "StudentStatus" NOT NULL DEFAULT 'ACTIVE',
     "gpa" DOUBLE PRECISION,
     "admission_type" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -193,7 +223,7 @@ CREATE TABLE "class_schedules" (
     "end_time" TIME(3) NOT NULL,
     "capacity" INTEGER NOT NULL,
     "enrolled_students_count" INTEGER NOT NULL DEFAULT 0,
-    "status" "ClassScheduleStatus" NOT NULL DEFAULT 'AKTIF',
+    "status" "ClassScheduleStatus" NOT NULL DEFAULT 'ACTIVE',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -205,7 +235,7 @@ CREATE TABLE "student_enrollments" (
     "student_id" UUID NOT NULL,
     "class_schedule_id" UUID NOT NULL,
     "enrollment_date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "status" "StudentEnrollmentStatus" NOT NULL DEFAULT 'TERDAFTAR',
+    "status" "StudentEnrollmentStatus" NOT NULL DEFAULT 'ENROLLED',
     "final_grade_letter" TEXT,
     "final_grade_score" DOUBLE PRECISION,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -221,7 +251,7 @@ CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 CREATE UNIQUE INDEX "users_addressId_key" ON "users"("addressId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "address_postalCode_key" ON "address"("postalCode");
+CREATE UNIQUE INDEX "addresses_country_id_key" ON "addresses"("country_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "departments_departement_name_key" ON "departments"("departement_name");
@@ -257,7 +287,16 @@ CREATE UNIQUE INDEX "academic_years_year_key" ON "academic_years"("year");
 CREATE UNIQUE INDEX "class_schedules_class_code_key" ON "class_schedules"("class_code");
 
 -- AddForeignKey
-ALTER TABLE "users" ADD CONSTRAINT "users_addressId_fkey" FOREIGN KEY ("addressId") REFERENCES "address"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "users" ADD CONSTRAINT "users_addressId_fkey" FOREIGN KEY ("addressId") REFERENCES "addresses"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "addresses" ADD CONSTRAINT "addresses_country_id_fkey" FOREIGN KEY ("country_id") REFERENCES "countries"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "cities" ADD CONSTRAINT "cities_state_id_fkey" FOREIGN KEY ("state_id") REFERENCES "states"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "states" ADD CONSTRAINT "states_country_id_fkey" FOREIGN KEY ("country_id") REFERENCES "countries"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "user_roles" ADD CONSTRAINT "user_roles_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
