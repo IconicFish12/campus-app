@@ -14,35 +14,35 @@ datasource db {
 // Enum DataType
 
 enum Gender {
-  LAKI
-  PEREMPUAN
-  LAINYA
+  MALE
+  FEMALE
+  OTHER
 }
 
 enum Status {
-  AKTIF
-  TIDAK_AKTIF
+  ACTIVE
+  INACTIVE
   SUSPANDED
 }
 
 enum Offer {
-  GANJIL
-  GENAP
-  PENDEK
+  ODD
+  EVEN
+  SHORT
 }
 
 enum SemesterName {
-  GANJIL
-  GENAP
-  PENDEK
+  ODD
+  EVEN
+  SHORT
 }
 
 enum StudentStatus {
-  AKTIF
-  CUTI
+  ACTIVE
+  ON_LEAVE
   DROPOUT
-  TIDAK_AKTIF
-  LULUS
+  INACTIVE
+  GRADUATING
 }
 
 enum EmploymentStatus {
@@ -60,31 +60,32 @@ enum AcademicRank {
 
 enum ProgramLevel {
   D3
-  S1
-  S2
-  S3
+  BACHELOR
+  MASTER
+  DOCTOR
 }
 
 enum DayOfWeek {
-  SENIN
-  SELASA
-  RABU
-  KAMIS
-  JUMAT
-  SABTU
-  MINGGU
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
 }
 
 enum ClassScheduleStatus {
-  AKTIF
-  TUNDA
+  ACTIVE
+  DELAY
+  CANCELLED
   PENUH
 }
 
 enum StudentEnrollmentStatus {
-  TERDAFTAR
-  DIHAPUS
-  SELESAI
+  ENROLLED
+  DROPPED
+  COMPLETED
 }
 
 // Model
@@ -98,7 +99,7 @@ model User {
   gender          Gender
   addressId       String?     @unique @map("addressId") @db.Uuid
   address         Address?    @relation(fields: [addressId], references: [id])
-  status          Status      @default(AKTIF)
+  status          Status      @default(ACTIVE)
   profile_picture String?     @map("profile_picture")
   isVerified      Boolean     @default(false) @map("is_verified")
   created_at      DateTime    @default(now()) @map("created_at")
@@ -111,15 +112,48 @@ model User {
 }
 
 model Address {
-  id          String  @id @default(uuid()) @db.Uuid
+  id          String   @id @default(uuid()) @db.Uuid
   User        User?
-  fullAddress String  @map("fullAddress")
-  cityId      String  @map("city_id") @db.Uuid
-  postalCode  Int?    @unique @map("postalCode")
-  stateId     String? @map("state_id") @db.Uuid
-  countryId   String? @map("country_id") @db.Uuid
+  fullAddress String   @map("full_address")
+  countryId   String?  @unique @map("country_id") @db.Uuid
+  country     Country? @relation(fields: [countryId], references: [id])
+  postalCode  Int?     @map("postal_code")
 
-  @@map("address")
+  @@map("addresses")
+}
+
+model City {
+  id         String   @id @default(uuid()) @db.Uuid
+  stateId    String   @map("state_id") @db.Uuid
+  state      State    @relation(fields: [stateId], references: [id])
+  name       String   @map("city_name")
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @updatedAt @map("updated_at")
+
+  @@map("cities")
+}
+
+model State {
+  id         String   @id @default(uuid()) @db.Uuid
+  countryId  String   @map("country_id") @db.Uuid
+  country    Country  @relation(fields: [countryId], references: [id])
+  name       String   @map("state_name")
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @updatedAt @map("updated_at")
+  City       City[]
+
+  @@map("states")
+}
+
+model Country {
+  id         String   @id @default(uuid()) @db.Uuid
+  name       String   @map("country_name")
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @updatedAt @map("updated_at")
+  State      State[]
+  Address    Address?
+
+  @@map("countries")
 }
 
 model Roles {
@@ -212,7 +246,7 @@ model Student {
   program           Programs?           @relation(fields: [programId], references: [id])
   enrollmentYear    Int                 @map("enrollment_year")
   currentSemester   Int                 @map("current_semester")
-  academicStatus    StudentStatus       @default(AKTIF) @map("academic_status")
+  academicStatus    StudentStatus       @default(ACTIVE) @map("academic_status")
   gpa               Float?
   admissionType     String?             @map("admission_type")
   createdAt         DateTime            @default(now()) @map("created_at")
@@ -274,7 +308,7 @@ model ClassSchedule {
   endTime               DateTime            @map("end_time") @db.Time(3)
   capacity              Int
   enrolledStudentsCount Int                 @default(0) @map("enrolled_students_count")
-  status                ClassScheduleStatus @default(AKTIF)
+  status                ClassScheduleStatus @default(ACTIVE)
 
   studentEnrollments StudentEnrollment[]
 
@@ -291,7 +325,7 @@ model StudentEnrollment {
   classScheduleId  String                  @map("class_schedule_id") @db.Uuid
   classSchedule    ClassSchedule           @relation(fields: [classScheduleId], references: [id])
   enrollmentDate   DateTime                @default(now()) @map("enrollment_date")
-  status           StudentEnrollmentStatus @default(TERDAFTAR)
+  status           StudentEnrollmentStatus @default(ENROLLED)
   finalGradeLetter String?                 @map("final_grade_letter")
   finalGradeScore  Float?                  @map("final_grade_score")
 
