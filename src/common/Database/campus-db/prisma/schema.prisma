@@ -88,6 +88,14 @@ enum StudentEnrollmentStatus {
   COMPLETED
 }
 
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  SICK
+  PERMITTED
+  LATE
+}
+
 // Model
 
 model User {
@@ -252,6 +260,7 @@ model Student {
   createdAt         DateTime            @default(now()) @map("created_at")
   updatedAt         DateTime            @updatedAt @map("updated_at")
   StudentEnrollment StudentEnrollment[]
+  Attendance        Attendance[]
 
   @@map("students")
 }
@@ -311,6 +320,7 @@ model ClassSchedule {
   status                ClassScheduleStatus @default(ACTIVE)
 
   studentEnrollments StudentEnrollment[]
+  Attendance         Attendance[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -334,4 +344,21 @@ model StudentEnrollment {
 
   @@id([studentId, classScheduleId]) // Primary Key Gabungan
   @@map("student_enrollments")
+}
+
+model Attendance {
+  id              String           @id @default(uuid()) @map("id") @db.Uuid
+  studentId       String           @map("student_id") @db.Uuid
+  student         Student          @relation(fields: [studentId], references: [userId])
+  classScheduleId String           @map("class_schedule_id") @db.Uuid
+  classSchedule   ClassSchedule    @relation(fields: [classScheduleId], references: [id])
+  status          AttendanceStatus @default(ABSENT) @map("status")
+  recordedAt      DateTime         @default(now()) @map("recorded_at") @db.Timestamp(3)
+  notes           String?          @map("notes") @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([studentId, classScheduleId])
+  @@map("attendances")
 }
