@@ -12,7 +12,6 @@ datasource db {
 }
 
 // --- ENUM DEFINITIONS ---
-// Pastikan nama Enum konsisten dengan yang digunakan di model
 enum LmsUserRole {
   STUDENT
   LECTURER
@@ -76,6 +75,25 @@ enum LmsAssignmentSubmissionStatus {
   LATE
 }
 
+enum AssignmentType {
+  REGULAR_TASK
+  PROJECT
+  GROUP_ASSIGNMENT
+  ESSAY
+  PRESENTATION
+  FORMAL_EXAM
+  SPECIAL_TASK
+}
+
+enum QuizType {
+  QUIZ
+  MIDTERM_EXAM
+  FINAL_EXAM
+  PRACTICE_TEST
+  POLL
+  SURVEY
+}
+
 // --- MODEL DEFINITIONS ---
 
 // 1. lms_courses Table (Mata Kuliah di LMS)
@@ -132,8 +150,8 @@ model LmsUser {
   attachments         Attachment[] // Lampiran yang diunggah
   announcements       Announcement[] // Pengumuman yang dibuat
 
-  createdAt  DateTime            @default(now()) @map("created_at")
-  updatedAt  DateTime            @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Pengguna LMS pengumpul dan penilai  
   submitedBy StudentSubmission[] @relation("StudentSubmissionStudent")
@@ -271,6 +289,7 @@ model Quiz {
   title                  String
   description            String?
   totalPoints            Float     @map("total_points")
+  type                   QuizType  @default(QUIZ) @map("quiz_type")
   dueDate                DateTime? @map("due_date") @db.Timestamp(3) // Menggunakan Timestamp untuk tanggal dan waktu
   timeLimitMinutes       Int?      @map("time_limit_minutes")
   maxAttempts            Int       @default(1) @map("max_attempts")
@@ -376,8 +395,9 @@ model Assignment {
   dueDate          DateTime                    @map("due_date") @db.Timestamp(3)
   submissionType   LmsAssignmentSubmissionType @map("submission_type")
   maxFileSizeMb    Int?                        @map("max_file_size_mb")
-  allowedFileTypes Json?                       @map("allowed_file_types") // Array of Strings, e.g., ['.pdf', '.docx']
+  allowedFileTypes Json?                       @map("allowed_file_types")
   isPublished      Boolean                     @default(false) @map("is_published")
+  type             AssignmentType              @default(REGULAR_TASK) @map("assignment_type")
 
   // Relasi balik
   studentSubmissions StudentSubmission[] // Pengumpulan tugas mahasiswa
@@ -407,6 +427,7 @@ model StudentSubmission {
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+
   @@map("student_submissions")
 }
 

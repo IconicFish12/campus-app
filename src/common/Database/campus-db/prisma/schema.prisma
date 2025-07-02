@@ -25,13 +25,7 @@ enum Status {
   SUSPANDED
 }
 
-enum Offer {
-  ODD
-  EVEN
-  SHORT
-}
-
-enum SemesterName {
+enum SemesterStatus {
   ODD
   EVEN
   SHORT
@@ -115,28 +109,30 @@ model User {
   lecturers       Lecturers?
   Student         Student?
   User_roles      UserRoles[]
+  Employee        Employee[]
 
   @@map("users")
 }
 
 model Address {
-  id          String   @id @default(uuid()) @db.Uuid
+  id          String @id @default(uuid()) @db.Uuid
   User        User?
-  fullAddress String   @map("full_address")
-  countryId   String?  @unique @map("country_id") @db.Uuid
-  country     Country? @relation(fields: [countryId], references: [id])
-  postalCode  Int?     @map("postal_code")
+  fullAddress String @map("full_address")
+  cityId      String @map("city_id") @db.Uuid
+  city        City   @relation(fields: [cityId], references: [id])
+  postalCode  Int?   @map("postal_code")
 
   @@map("addresses")
 }
 
 model City {
-  id         String   @id @default(uuid()) @db.Uuid
-  stateId    String   @map("state_id") @db.Uuid
-  state      State    @relation(fields: [stateId], references: [id])
-  name       String   @map("city_name")
-  created_at DateTime @default(now()) @map("created_at")
-  updated_at DateTime @updatedAt @map("updated_at")
+  id         String    @id @default(uuid()) @db.Uuid
+  stateId    String    @map("state_id") @db.Uuid
+  state      State     @relation(fields: [stateId], references: [id])
+  name       String    @map("city_name")
+  created_at DateTime  @default(now()) @map("created_at")
+  updated_at DateTime  @updatedAt @map("updated_at")
+  Address    Address[]
 
   @@map("cities")
 }
@@ -159,7 +155,6 @@ model Country {
   created_at DateTime @default(now()) @map("created_at")
   updated_at DateTime @updatedAt @map("updated_at")
   State      State[]
-  Address    Address?
 
   @@map("countries")
 }
@@ -167,7 +162,7 @@ model Country {
 model Roles {
   id          String      @id @default(uuid()) @db.Uuid
   name        String      @map("roles_name")
-  description String?     @map("description")
+  description String?     @map("description") @db.Text
   created_at  DateTime    @default(now()) @map("created_at")
   updated_at  DateTime    @updatedAt @map("updated_at")
   userRoles   UserRoles[]
@@ -176,8 +171,8 @@ model Roles {
 }
 
 model UserRoles {
-  userId String @default(uuid()) @db.Uuid
-  roleId String @default(uuid()) @db.Uuid
+  userId String @db.Uuid
+  roleId String @db.Uuid
   user   User   @relation(fields: [userId], references: [id])
   role   Roles  @relation(fields: [roleId], references: [id])
 
@@ -186,14 +181,14 @@ model UserRoles {
 }
 
 model Departments {
-  id          String     @id @default(uuid()) @db.Uuid
-  name        String     @unique @map("departement_name")
-  code        String     @unique @map("departement_code")
-  description String?    @map("description")
+  id          String      @id @default(uuid()) @db.Uuid
+  name        String      @unique @map("department_name")
+  code        String      @unique @map("department_code")
+  description String?     @map("description") @db.Text
   program     Programs[]
-  created_at  DateTime   @default(now()) @map("created_at")
-  updated_at  DateTime   @updatedAt @map("updated_at")
-  Lecturers   Lecturers?
+  created_at  DateTime    @default(now()) @map("created_at")
+  updated_at  DateTime    @updatedAt @map("updated_at")
+  Lecturers   Lecturers[]
 
   @@map("departments")
 }
@@ -208,7 +203,7 @@ model Programs {
   courses      Courses[]
   created_at   DateTime     @default(now()) @map("created_at")
   updated_at   DateTime     @updatedAt @map("updated_at")
-  Student      Student?
+  Student      Student[]
 
   @@map("progams")
 }
@@ -221,7 +216,7 @@ model Courses {
   programId        String          @map("program_id") @db.Uuid
   program          Programs        @relation(fields: [programId], references: [id])
   prerequisites    Json            @map("prerequisites")
-  semester_offered Offer?          @map("semester_offered")
+  semester_offered SemesterStatus? @map("semester_offered")
   created_at       DateTime        @default(now()) @map("created_at")
   updated_at       DateTime        @updatedAt @map("updated_at")
   ClassSchedule    ClassSchedule[]
@@ -283,15 +278,15 @@ model AcademicYear {
 
 // 10. Semester Table (Semester)
 model Semester {
-  id                       String       @id @default(uuid()) @map("id") @db.Uuid
-  academicYearId           String       @map("academic_year_id") @db.Uuid
-  academicYear             AcademicYear @relation(fields: [academicYearId], references: [id])
-  name                     SemesterName
-  startDate                DateTime     @map("start_date") @db.Date
-  endDate                  DateTime     @map("end_date") @db.Date
-  registrationStartDate    DateTime?    @map("registration_start_date") @db.Date
-  registrationEndDate      DateTime?    @map("registration_end_date") @db.Date
-  gradesSubmissionDeadline DateTime?    @map("grades_submission_deadline") @db.Date
+  id                       String         @id @default(uuid()) @map("id") @db.Uuid
+  academicYearId           String         @map("academic_year_id") @db.Uuid
+  academicYear             AcademicYear   @relation(fields: [academicYearId], references: [id])
+  name                     SemesterStatus
+  startDate                DateTime       @map("start_date") @db.Date
+  endDate                  DateTime       @map("end_date") @db.Date
+  registrationStartDate    DateTime?      @map("registration_start_date") @db.Date
+  registrationEndDate      DateTime?      @map("registration_end_date") @db.Date
+  gradesSubmissionDeadline DateTime?      @map("grades_submission_deadline") @db.Date
 
   classSchedules ClassSchedule[]
 
@@ -361,4 +356,9 @@ model Attendance {
 
   @@unique([studentId, classScheduleId])
   @@map("attendances")
+}
+
+model Employee {
+  userId String @id @map("user_id") @db.Uuid
+  user   User   @relation(fields: [userId], references: [id])
 }
