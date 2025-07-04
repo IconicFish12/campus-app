@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
-import { CampusDbServiceService } from './campus-db/campus-db-service.service';
-import { LmsDbServiceService } from './lms-db/lms-db-service.service';
+import { CampusDbModule } from './campus-db/campus-db.module';
+import { LmsDbModule } from './lms-db/lms-db.module';
 
 @Module({
-  providers: [CampusDbServiceService, LmsDbServiceService],
+  imports: [CampusDbModule, LmsDbModule],
+  exports: [CampusDbModule, LmsDbModule],
 })
 export class DatabaseModule {}

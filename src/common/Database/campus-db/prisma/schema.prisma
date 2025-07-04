@@ -227,7 +227,7 @@ model Courses {
 model Lecturers {
   userId           String           @id @map("user_id") @db.Uuid
   user             User             @relation(fields: [userId], references: [id])
-  nidn             String?
+  nidn             String
   academicRank     AcademicRank?    @map("academic_rank")
   departmentId     String           @unique @map("department_id") @db.Uuid
   departement      Departments?     @relation(fields: [departmentId], references: [id])
@@ -361,4 +361,13 @@ model Attendance {
 model Employee {
   userId String @id @map("user_id") @db.Uuid
   user   User   @relation(fields: [userId], references: [id])
+  employeeId  String?   @unique @map("employee_id") 
+  position    String?   @map("position")
+  department  String?   @map("department")
+  hireDate    DateTime  @map("hire_date") 
+  status      EmploymentStatus   @map("status") @default(FULL_TIME)
+
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  @@map("employees")
 }

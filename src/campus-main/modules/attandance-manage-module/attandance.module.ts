@@ -5,5 +5,6 @@ import { AttandanceController } from './attandance.controller';
 @Module({
   controllers: [AttandanceController],
   providers: [AttandanceService],
+  exports: [AttandanceService],
 })
 export class AttandanceModule {}
