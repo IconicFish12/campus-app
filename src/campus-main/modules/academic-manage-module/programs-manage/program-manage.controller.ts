@@ -11,7 +11,7 @@ import { ProgramManageService } from './program-manage.service';
 import { CreateProgramManageDto } from './dto/create-program-manage.dto';
 import { UpdateProgramManageDto } from './dto/update-program-manage.dto';
 
-@Controller('program-manage')
+@Controller()
 export class ProgramManageController {
   constructor(
     private readonly programManageModuleService: ProgramManageService,

@@ -22,6 +22,9 @@ import { AdmissionModule } from './campus-main/modules/admission-manage-module/a
 import { AttandanceModule } from './campus-main/modules/attandance-manage-module/attandance.module';
 import { CoursesModule } from './campus-main/modules/courses-manage-module/courses.module';
 import { ConfigModule } from '@nestjs/config';
+import { CountryManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/address-manage/country-manage/country-manage.module';
+import { CityManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/address-manage/city-manage/city-manage.module';
+import { CountryStateManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/address-manage/country-state-manage/country-state-manage.module';
 
 @Module({
   imports: [
@@ -38,17 +41,30 @@ import { ConfigModule } from '@nestjs/config';
         module: CampusMainModule,
         children: [
           {
-            path: 'user-manage',
+            path: 'campus-users-manage',
             module: CampusUsersManageModule,
             children: [
               {
-                path: 'users',
+                path: 'users-manage',
                 module: CampusUsersManageModule,
                 children: [
                   {
                     path: 'address-manage',
                     module: AddressManageModule,
-                    children: [],
+                    children: [
+                      {
+                        path: 'country-manage-module',
+                        module: CountryManageModule,
+                      },
+                      {
+                        path: 'state-manage-module',
+                        module: CountryStateManageModule,
+                      },
+                      {
+                        path: 'city-manage-module',
+                        module: CityManageModule,
+                      },
+                    ],
                   },
                   {
                     path: 'roles-manage',

@@ -11,7 +11,7 @@ import { CourseEnrollmentManageService } from './course-enrollment-manage.servic
 import { CreateCourseEnrollmentManageDto } from './dto/create-course-enrollment-manage.dto';
 import { UpdateCourseEnrollmentManageDto } from './dto/update-course-enrollment-manage.dto';
 
-@Controller('course-enrollment-manage')
+@Controller()
 export class CourseEnrollmentManageController {
   constructor(
     private readonly courseEnrollmentManageService: CourseEnrollmentManageService,

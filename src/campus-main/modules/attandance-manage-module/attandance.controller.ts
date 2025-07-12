@@ -1,9 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { AttandanceService } from './attandance.service';
 import { CreateAttandanceDto } from './dto/create-attandance.dto';
 import { UpdateAttandanceDto } from './dto/update-attandance.dto';
 
-@Controller('attandance')
+@Controller()
 export class AttandanceController {
   constructor(private readonly attandanceService: AttandanceService) {}
 
@@ -23,7 +31,10 @@ export class AttandanceController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAttandanceDto: UpdateAttandanceDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateAttandanceDto: UpdateAttandanceDto,
+  ) {
     return this.attandanceService.update(+id, updateAttandanceDto);
   }
 

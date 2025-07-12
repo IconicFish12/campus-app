@@ -11,7 +11,7 @@ import { QuotaManageService } from './quota-manage.service';
 import { CreateQuotaManageDto } from './dto/create-quota-manage.dto';
 import { UpdateQuotaManageDto } from './dto/update-quota-manage.dto';
 
-@Controller('quota-manage')
+@Controller()
 export class QuotaManageController {
   constructor(private readonly quotaManageService: QuotaManageService) {}
 

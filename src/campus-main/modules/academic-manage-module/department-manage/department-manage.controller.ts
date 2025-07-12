@@ -11,7 +11,7 @@ import { DepartmentManageService } from './department-manage.service';
 import { CreateDepartmentManageDto } from './dto/create-department-manage.dto';
 import { UpdateDepartmentManageDto } from './dto/update-department-manage.dto';
 
-@Controller('department-manage')
+@Controller()
 export class DepartmentManageController {
   constructor(
     private readonly departmentManageModuleService: DepartmentManageService,

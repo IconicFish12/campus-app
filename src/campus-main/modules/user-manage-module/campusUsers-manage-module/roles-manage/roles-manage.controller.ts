@@ -1,9 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { RolesManageService } from './roles-manage.service';
 import { CreateRolesManageDto } from './dto/create-roles-manage.dto';
 import { UpdateRolesManageDto } from './dto/update-roles-manage.dto';
 
-@Controller('roles-manage')
+@Controller()
 export class RolesManageController {
   constructor(private readonly rolesManageService: RolesManageService) {}
 
@@ -23,7 +31,10 @@ export class RolesManageController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRolesManageDto: UpdateRolesManageDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateRolesManageDto: UpdateRolesManageDto,
+  ) {
     return this.rolesManageService.update(+id, updateRolesManageDto);
   }
 

@@ -1,9 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { AddressManageService } from './address-manage.service';
 import { CreateAddressManageDto } from './dto/create-address-manage.dto';
 import { UpdateAddressManageDto } from './dto/update-address-manage.dto';
 
-@Controller('address-manage')
+@Controller()
 export class AddressManageController {
   constructor(private readonly addressManageService: AddressManageService) {}
 
@@ -23,7 +31,10 @@ export class AddressManageController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAddressManageDto: UpdateAddressManageDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateAddressManageDto: UpdateAddressManageDto,
+  ) {
     return this.addressManageService.update(+id, updateAddressManageDto);
   }
 
