@@ -7,18 +7,16 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { CountryStateManageService } from './country-state-manage.service';
-import { CreateCountryStateManageDto } from './dto/create-country-state-manage.dto';
-import { UpdateCountryStateManageDto } from './dto/update-country-state-manage.dto';
+import { StateManageService } from './state-manage.service';
+import { CreateStateManageDto } from './dto/create-state-manage.dto';
+import { UpdateStateManageDto } from './dto/update-state-manage.dto';
 
 @Controller()
-export class CountryStateManageController {
-  constructor(
-    private readonly countryStateManageService: CountryStateManageService,
-  ) {}
+export class StateManageController {
+  constructor(private readonly countryStateManageService: StateManageService) {}
 
   @Post()
-  create(@Body() createCountryStateManageDto: CreateCountryStateManageDto) {
+  create(@Body() createCountryStateManageDto: CreateStateManageDto) {
     return this.countryStateManageService.create(createCountryStateManageDto);
   }
 
@@ -35,7 +33,7 @@ export class CountryStateManageController {
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body() updateCountryStateManageDto: UpdateCountryStateManageDto,
+    @Body() updateCountryStateManageDto: UpdateStateManageDto,
   ) {
     return this.countryStateManageService.update(
       +id,

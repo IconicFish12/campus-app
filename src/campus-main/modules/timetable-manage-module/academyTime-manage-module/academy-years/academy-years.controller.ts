@@ -11,7 +11,7 @@ import { AcademyYearsService } from './academy-years.service';
 import { CreateAcademyYearDto } from './dto/create-academy-year.dto';
 import { UpdateAcademyYearDto } from './dto/update-academy-year.dto';
 
-@Controller('academy-years')
+@Controller()
 export class AcademyYearsController {
   constructor(private readonly academyYearsService: AcademyYearsService) {}
 

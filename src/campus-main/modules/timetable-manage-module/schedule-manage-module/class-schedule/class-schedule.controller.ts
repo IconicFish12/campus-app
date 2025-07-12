@@ -11,7 +11,7 @@ import { ClassScheduleService } from './class-schedule.service';
 import { CreateClassScheduleDto } from './dto/create-class-schedule.dto';
 import { UpdateClassScheduleDto } from './dto/update-class-schedule.dto';
 
-@Controller('class-schedule')
+@Controller()
 export class ClassScheduleController {
   constructor(private readonly classScheduleService: ClassScheduleService) {}
 

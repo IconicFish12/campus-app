@@ -11,7 +11,7 @@ import { CityManageService } from './city-manage.service';
 import { CreateCityManageDto } from './dto/create-city-manage.dto';
 import { UpdateCityManageDto } from './dto/update-city-manage.dto';
 
-@Controller('city-manage')
+@Controller()
 export class CityManageController {
   constructor(private readonly cityManageService: CityManageService) {}
 

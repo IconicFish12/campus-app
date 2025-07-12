@@ -11,7 +11,7 @@ import { GeneralScheduleService } from './general-schedule.service';
 import { CreateGeneralScheduleDto } from './dto/create-general-schedule.dto';
 import { UpdateGeneralScheduleDto } from './dto/update-general-schedule.dto';
 
-@Controller('general-schedule')
+@Controller()
 export class GeneralScheduleController {
   constructor(
     private readonly generalScheduleService: GeneralScheduleService,

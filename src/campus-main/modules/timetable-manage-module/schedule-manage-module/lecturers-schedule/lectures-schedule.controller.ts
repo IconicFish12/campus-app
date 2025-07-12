@@ -11,7 +11,7 @@ import { LecturesScheduleService } from './lectures-schedule.service';
 import { CreateLecturesScheduleDto } from './dto/create-lectures-schedule.dto';
 import { UpdateLecturesScheduleDto } from './dto/update-lectures-schedule.dto';
 
-@Controller('lectures-schedule')
+@Controller()
 export class LecturesScheduleController {
   constructor(
     private readonly lecturesScheduleService: LecturesScheduleService,

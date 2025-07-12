@@ -11,7 +11,7 @@ import { SemesterService } from './semester.service';
 import { CreateSemesterDto } from './dto/create-semester.dto';
 import { UpdateSemesterDto } from './dto/update-semester.dto';
 
-@Controller('semester')
+@Controller()
 export class SemesterController {
   constructor(private readonly semesterService: SemesterService) {}
 

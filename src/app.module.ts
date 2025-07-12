@@ -24,7 +24,11 @@ import { CoursesModule } from './campus-main/modules/courses-manage-module/cours
 import { ConfigModule } from '@nestjs/config';
 import { CountryManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/address-manage/country-manage/country-manage.module';
 import { CityManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/address-manage/city-manage/city-manage.module';
-import { CountryStateManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/address-manage/country-state-manage/country-state-manage.module';
+import { StateManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/address-manage/country-state-manage/state-manage.module';
+import { ScheduleManageModule } from './campus-main/modules/timetable-manage-module/schedule-manage-module/schedule-manage.module';
+import { ClassScheduleModule } from './campus-main/modules/timetable-manage-module/schedule-manage-module/class-schedule/class-schedule.module';
+import { LecturesScheduleModule } from './campus-main/modules/timetable-manage-module/schedule-manage-module/lecturers-schedule/lectures-schedule.module';
+import { GeneralScheduleModule } from './campus-main/modules/timetable-manage-module/schedule-manage-module/general-schedule/general-schedule.module';
 
 @Module({
   imports: [
@@ -41,112 +45,82 @@ import { CountryStateManageModule } from './campus-main/modules/user-manage-modu
         module: CampusMainModule,
         children: [
           {
-            path: 'campus-users-manage',
+            path: 'users-manage',
             module: CampusUsersManageModule,
             children: [
               {
-                path: 'users-manage',
-                module: CampusUsersManageModule,
+                path: 'addresses',
+                module: AddressManageModule,
                 children: [
-                  {
-                    path: 'address-manage',
-                    module: AddressManageModule,
-                    children: [
-                      {
-                        path: 'country-manage-module',
-                        module: CountryManageModule,
-                      },
-                      {
-                        path: 'state-manage-module',
-                        module: CountryStateManageModule,
-                      },
-                      {
-                        path: 'city-manage-module',
-                        module: CityManageModule,
-                      },
-                    ],
-                  },
-                  {
-                    path: 'roles-manage',
-                    module: RolesManageModule,
-                    children: [
-                      {
-                        path: 'user-roles-manage',
-                        module: UsersRolesManageModule,
-                      },
-                    ],
-                  },
+                  { path: 'countries', module: CountryManageModule },
+                  { path: 'states', module: StateManageModule },
+                  { path: 'cities', module: CityManageModule },
                 ],
               },
               {
-                path: 'hr-manage',
-                module: HrManageModule,
+                path: 'roles',
+                module: RolesManageModule,
                 children: [
-                  {
-                    path: 'employee-manage',
-                    module: EmployeeModule,
-                  },
-                  {
-                    path: 'lecturers-manage',
-                    module: LecturersModule,
-                  },
+                  { path: 'user-assignments', module: UsersRolesManageModule },
                 ],
-              },
-              {
-                path: 'student-manage',
-                module: StudentModule,
               },
             ],
           },
           {
-            path: 'timetable-manage',
+            path: 'hr-manage',
+            module: HrManageModule,
+            children: [
+              { path: 'employees', module: EmployeeModule },
+              { path: 'lecturers', module: LecturersModule },
+            ],
+          },
+          {
+            path: 'students-manage',
+            module: StudentModule,
+          },
+          {
+            path: 'timetables-manage',
             module: TimeTableManageModule,
             children: [
               {
-                path: 'academy-time-manage',
+                path: 'academic-periods',
                 module: AcademyTimeManageModule,
                 children: [
-                  {
-                    path: 'acadmey-years-manage',
-                    module: AcademyYearsModule,
-                  },
-                  {
-                    path: 'semester-manage',
-                    module: SemesterModule,
-                  },
+                  { path: 'years', module: AcademyYearsModule },
+                  { path: 'semesters', module: SemesterModule },
                 ],
               },
               {
-                path: 'semester-manage',
-                module: SemesterModule,
+                path: 'schedules-manage',
+                module: ScheduleManageModule,
+                children: [
+                  { path: 'class-schedules', module: ClassScheduleModule },
+                  {
+                    path: 'lecturers-schedules',
+                    module: LecturesScheduleModule,
+                  },
+                  {
+                    path: 'general-schedules',
+                    module: GeneralScheduleModule,
+                  },
+                ],
               },
             ],
           },
           {
-            path: 'academic-manage',
+            path: 'academics-manage',
             module: AcademicManageModule,
             children: [
-              {
-                path: 'department-manage',
-                module: DepartmentManageModule,
-              },
-              {
-                path: 'programs-manage',
-                module: ProgramManageModule,
-              },
+              { path: 'departments', module: DepartmentManageModule },
+              { path: 'programs', module: ProgramManageModule },
             ],
           },
-          {
-            path: 'courses-manage',
-            module: CoursesModule,
-          },
-          {
-            path: 'attandance-manage',
-            module: AttandanceModule,
-          },
+          { path: 'courses', module: CoursesModule },
+          { path: 'attendance', module: AttandanceModule },
           {
             path: 'admission-manage',
             module: AdmissionModule,
+            children: [],
           },
         ],
       },
