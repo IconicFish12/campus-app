@@ -4,6 +4,16 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "webpack": false,
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "assets": [
+      {
+        "include": "common/Database/campus-db/generated/campus-client",
+        "outDir": "dist/common/Database/campus-db/generated/campus-client"
+      },
+      {
+        "include": "common/Database/lms-db/generated/lms-client",
+        "outDir": "dist/common/Database/lms-db/generated/lms-client"
+      }
+    ]
   }
 }

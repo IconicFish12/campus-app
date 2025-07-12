@@ -3,28 +3,32 @@ import { DatabaseModule } from './common/Database/database.module';
 import { RouterModule } from '@nestjs/core';
 import { CampusMainModule } from './campus-main/modules/campus-main.module';
 import { LmsManageModule } from './campus-lms/modules/lms-manage.module';
-import { UserManageModule } from './campus-main/modules/user-manage-module/user-manage.module';
-import { UsersModule } from './campus-main/modules/user-manage-module/users/users.module';
+import { CampusUsersManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/campusUsers-manage.module';
+import { AddressManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/address-manage/address-manage.module';
+import { RolesManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/roles-manage/roles-manage.module';
+import { UsersRolesManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/roles-manage/users-roles-manage/users-roles-manage.module';
 import { HrManageModule } from './campus-main/modules/user-manage-module/hr-manage-module/hr-manage.module';
+import { EmployeeModule } from './campus-main/modules/user-manage-module/hr-manage-module/employee-manage-module/employee.module';
+import { LecturersModule } from './campus-main/modules/user-manage-module/hr-manage-module/lecturers-manage-module/lecturers.module';
 import { StudentModule } from './campus-main/modules/user-manage-module/student-manage-module/student.module';
 import { TimeTableManageModule } from './campus-main/modules/timetable-manage-module/timetable-manage.module';
 import { AcademyTimeManageModule } from './campus-main/modules/timetable-manage-module/academyTime-manage-module/academy-time-manage.module';
-import { SemesterModule } from './campus-main/modules/timetable-manage-module/academyTime-manage-module/semester/semester.module';
-import { CoursesModule } from './campus-main/modules/courses-manage-module/courses.module';
-import { AttandanceModule } from './campus-main/modules/attandance-manage-module/attandance.module';
-import { AdmissionModule } from './campus-main/modules/admission-manage-module/admission.module';
-import { AcademicManageModule } from './campus-main/modules/academic-manage-module/academic-manage.module';
-import { AddressManageModule } from './campus-main/modules/user-manage-module/users/address-manage/address-manage.module';
-import { RolesManageModule } from './campus-main/modules/user-manage-module/users/roles-manage/roles-manage.module';
-import { UsersRolesManageModule } from './campus-main/modules/user-manage-module/users/roles-manage/users-roles-manage/users-roles-manage.module';
-import { EmployeeModule } from './campus-main/modules/user-manage-module/hr-manage-module/employee-manage-module/employee.module';
-import { LecturersModule } from './campus-main/modules/user-manage-module/hr-manage-module/lecturers-manage-module/lecturers.module';
 import { AcademyYearsModule } from './campus-main/modules/timetable-manage-module/academyTime-manage-module/academy-years/academy-years.module';
-import { DepartmentManageModuleModule } from './campus-main/modules/academic-manage-module/department-manage-module/department-manage-module.module';
-import { ProgramManageModuleModule } from './campus-main/modules/academic-manage-module/programs-manage-module/program-manage-module.module';
+import { SemesterModule } from './campus-main/modules/timetable-manage-module/academyTime-manage-module/semester/semester.module';
+import { AcademicManageModule } from './campus-main/modules/academic-manage-module/academic-manage.module';
+import { DepartmentManageModule } from './campus-main/modules/academic-manage-module/department-manage/department-manage.module';
+import { ProgramManageModule } from './campus-main/modules/academic-manage-module/programs-manage/program-manage.module';
+import { AdmissionModule } from './campus-main/modules/admission-manage-module/admission.module';
+import { AttandanceModule } from './campus-main/modules/attandance-manage-module/attandance.module';
+import { CoursesModule } from './campus-main/modules/courses-manage-module/courses.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
     DatabaseModule,
     CampusMainModule,
     LmsManageModule,
@@ -35,11 +39,11 @@ import { ProgramManageModuleModule } from './campus-main/modules/academic-manage
         children: [
           {
             path: 'user-manage',
-            module: UserManageModule,
+            module: CampusUsersManageModule,
             children: [
               {
                 path: 'users',
-                module: UsersModule,
+                module: CampusUsersManageModule,
                 children: [
                   {
                     path: 'address-manage',
@@ -108,11 +112,11 @@ import { ProgramManageModuleModule } from './campus-main/modules/academic-manage
             children: [
               {
                 path: 'department-manage',
-                module: DepartmentManageModuleModule,
+                module: DepartmentManageModule,
               },
               {
                 path: 'programs-manage',
-                module: ProgramManageModuleModule,
+                module: ProgramManageModule,
               },
             ],
           },

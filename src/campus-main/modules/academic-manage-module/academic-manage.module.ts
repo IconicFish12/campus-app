@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
-import { DepartmentManageModuleModule } from './department-manage-module/department-manage-module.module';
-import { ProgramManageModuleModule } from './programs-manage-module/program-manage-module.module';
+import { DepartmentManageModule } from './department-manage/department-manage.module';
+import { ProgramManageModule } from './programs-manage/program-manage.module';
+import { CampusDbModule } from 'src/common/Database/campus-db/campus-db.module';
 
 @Module({
-  imports: [DepartmentManageModuleModule, ProgramManageModuleModule],
-  exports: [ProgramManageModuleModule],
+  imports: [DepartmentManageModule, ProgramManageModule, CampusDbModule],
+  exports: [DepartmentManageModule, ProgramManageModule],
 })
 export class AcademicManageModule {}
