@@ -1,7 +1,15 @@
-import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import { Expose } from 'class-transformer';
+import { IsUnique } from 'src/common/pipes/validators/is-unique-validators';
 
 export class CreateDepartmentManageDto {
+  // Departments Name
   @IsString({
     message: 'Department name is must be a text',
   })
@@ -15,9 +23,15 @@ export class CreateDepartmentManageDto {
     message: 'Departmnet name is cannot be empty',
   })
   @Expose({ name: 'department_name' })
-  // @Transform(({ value }) => value.trim())
+  @IsUnique(
+    { model: 'departments', field: 'department_name' },
+    {
+      message: 'The study departments name has been registered',
+    },
+  )
   readonly name: string;
 
+  // Departments Code
   @IsString({
     message: 'Department code is must be a text',
   })
@@ -31,14 +45,22 @@ export class CreateDepartmentManageDto {
     message: 'Department code is cannot be empty',
   })
   @Expose({ name: 'department_code' })
+  @IsUnique(
+    { model: 'departments', field: 'department_code' },
+    {
+      message: 'The study department code has been registered',
+    },
+  )
   readonly code: string;
 
+  // Departments Descpription
   @IsString({
     message: 'Department Description is must be a text',
   })
   @IsNotEmpty({
     message: 'Department Decsiption is cannot be empty',
   })
-  @Expose({ name: 'decription' })
+  @IsOptional()
+  @Expose({ name: 'description' })
   readonly desciption: string;
 }

@@ -7,6 +7,8 @@ import {
   ValidationError,
   ValidationPipe,
 } from '@nestjs/common';
+import { ResponseMappingInterceptor } from './common/interceptors/responseMapping.interceptor.js';
+import { CostumeValidationPipe } from './common/pipes/costume-validation.pipe.js';
 // import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 // import { ConfigService } from '@nestjs/config';
 async function bootstrap() {
@@ -21,44 +23,40 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
       transform: true,
       exceptionFactory: (validationErrors: ValidationError[] = []) => {
-        const getPrettyClassValidatorErrors = (
-          validationErrors: ValidationError[],
-          parentProperty = '',
-        ): Array<{ property: string; errors: string[] }> => {
-          const errors = [];
+        interface FormattedError {
+          property: string;
+          errors: string[];
+        }
 
-          const getValidationErrorsRecursively = (
-            validationErrors: ValidationError[],
-            parentProperty = '',
-          ) => {
-            for (const error of validationErrors) {
-              const propertyPath = parentProperty
-                ? `${parentProperty}.${error.property}`
-                : error.property;
-
-              if (error.constraints) {
-                errors.push();
-              }
-
-              if (error.children?.length) {
-                getValidationErrorsRecursively(error.children, propertyPath);
-              }
+        const formatErrors = (errors: ValidationError[]): FormattedError[] => {
+          const formattedErrors: FormattedError[] = [];
+          for (const error of errors) {
+            if (error.constraints) {
+              formattedErrors.push({
+                property: error.property,
+                errors: Object.values(error.constraints),
+              });
             }
-          };
-
-          getValidationErrorsRecursively(validationErrors, parentProperty);
-
-          return errors;
+            if (error.children && error.children.length > 0) {
+              formattedErrors.push(...formatErrors(error.children));
+            }
+          }
+          return formattedErrors;
         };
 
-        const errors = getPrettyClassValidatorErrors(validationErrors);
+        const formattedValidationErrors = formatErrors(validationErrors);
 
         return new BadRequestException({
-          message: 'validation error',
-          errors: errors,
+          message: 'Validasi input gagal',
+          errors: formattedValidationErrors,
         });
       },
     }),
+  );
+  app.useGlobalInterceptors(new ResponseMappingInterceptor());
+  app.useGlobalPipes(
+    new ValidationPipe({ whitelist: true }),
+    new CostumeValidationPipe(),
   );
 
   // Get The NestJS Configuration Service

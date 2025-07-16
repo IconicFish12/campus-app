@@ -27,7 +27,6 @@ export class DepartmentManageService {
       });
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        //Prisma Error Code = P2002 -> kode error Prisma untuk pelanggaran constraint unik
         if (error.code == 'P2002') {
           throw new BadRequestException(`${error.message}`);
         }
@@ -85,6 +84,8 @@ export class DepartmentManageService {
               programs: true,
             },
           },
+          lecturers: true,
+          programs: true,
         },
         where: {
           id: id,

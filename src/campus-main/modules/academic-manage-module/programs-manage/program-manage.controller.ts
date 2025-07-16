@@ -29,7 +29,7 @@ export class ProgramManageController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.programManageModuleService.findOne(+id);
+    return this.programManageModuleService.findOne(id);
   }
 
   @Patch(':id')
@@ -38,13 +38,13 @@ export class ProgramManageController {
     @Body() updateProgramManageModuleDto: UpdateProgramManageDto,
   ) {
     return this.programManageModuleService.update(
-      +id,
+      id,
       updateProgramManageModuleDto,
     );
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.programManageModuleService.remove(+id);
+    return this.programManageModuleService.remove(id);
   }
 }

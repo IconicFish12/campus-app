@@ -115,16 +115,16 @@ model User {
 
 model Address {
   id          String @id @default(uuid()) @db.Uuid
-  user        User? // User -> user (camelCase)
+  user        User? 
   fullAddress String @map("full_address")
-  cityId      String @map("city_id") @db.Uuid // Tambahkan FK ke City
+  cityId      String @map("city_id") @db.Uuid 
   city        City   @relation(fields: [cityId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  postalCode  Int?   @map("postal_code") // Hapus @unique
+  postalCode  Int?   @map("postal_code") 
 
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamp()
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp()
 
-  @@map("addresses") // address -> addresses (plural)
+  @@map("addresses") 
 }
 
 model City {
@@ -134,7 +134,7 @@ model City {
   name      String    @map("city_name")
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp()
   updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamp()
-  addresses Address[] // Address -> addresses (plural)
+  addresses Address[] 
 
   @@map("cities")
 }
