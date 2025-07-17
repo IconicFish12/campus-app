@@ -1,13 +1,14 @@
 import { Expose } from 'class-transformer';
 import {
+  IsEnum,
   IsNotEmpty,
   IsString,
   IsUUID,
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { ProgramLevel } from 'src/common/Database/campus-db/generated/campus-client';
 import { IsUnique } from 'src/common/pipes/validators/is-unique-validators';
-
 export class CreateProgramManageDto {
   // Program Name
   @IsString({
@@ -57,7 +58,11 @@ export class CreateProgramManageDto {
   @IsNotEmpty({
     message: 'Program Level is cannot be empty',
   })
-  readonly level: string;
+  @IsEnum(ProgramLevel, {
+    message:
+      'Program Study Level is Not valid, Choose between D3, BACHELOR, MASTER, and DOCTOR',
+  })
+  readonly level: ProgramLevel;
 
   // Departments ID
   @IsString({

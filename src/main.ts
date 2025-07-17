@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { ResponseMappingInterceptor } from './common/interceptors/responseMapping.interceptor.js';
 import { CostumeValidationPipe } from './common/pipes/costume-validation.pipe.js';
+import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter.js';
 // import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 // import { ConfigService } from '@nestjs/config';
 async function bootstrap() {
@@ -58,6 +59,7 @@ async function bootstrap() {
     new ValidationPipe({ whitelist: true }),
     new CostumeValidationPipe(),
   );
+  app.useGlobalFilters(new PrismaExceptionFilter());
 
   // Get The NestJS Configuration Service
   // const configService = app.get(ConfigService);

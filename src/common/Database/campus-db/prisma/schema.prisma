@@ -72,7 +72,7 @@ enum ClassScheduleStatus {
   ACTIVE
   DELAY
   CANCELLED
-  FULL // PENUH dikoreksi menjadi FULL untuk konsistensi bahasa Inggris
+  FULL 
 }
 
 enum EnrollmentStatus {
