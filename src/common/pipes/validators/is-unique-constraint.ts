@@ -5,16 +5,24 @@ import {
   ValidatorConstraintInterface,
   ValidationArguments,
 } from 'class-validator';
-import { Injectable } from '@nestjs/common';
-import { CampusPrismaModelName } from './models/campus-model.prisma';
-import { CampusDbService } from 'src/common/Database/campus-db/campus-db.service';
+import { Injectable, Scope } from '@nestjs/common';
+import { CampusPrismaModelName } from './models/campus-prisma-models';
+import { PrismaClient as GeneratedPrismaClient } from 'src/common/Database/campus-db/generated/campus-client';
 
 @ValidatorConstraint({ name: 'isUnique', async: true })
-@Injectable()
+@Injectable({ scope: Scope.REQUEST }) // Tetap di REQUEST scope
 export class IsUniqueConstraint implements ValidatorConstraintInterface {
-  constructor(private readonly campusDbService: CampusDbService) {}
+  private prismaClient: GeneratedPrismaClient;
+
+  constructor() {
+    this.prismaClient = new GeneratedPrismaClient();
+  }
 
   async validate(value: any, args: ValidationArguments): Promise<boolean> {
+    if (!this.prismaClient) {
+      return false;
+    }
+
     const [model, field, excludeIdField] = args.constraints as [
       CampusPrismaModelName,
       string,
@@ -26,7 +34,7 @@ export class IsUniqueConstraint implements ValidatorConstraintInterface {
     }
 
     const modelAccessor: { findFirst: (args: any) => Promise<any> } = (
-      this.campusDbService as any
+      this.prismaClient as any
     )[model];
 
     if (!modelAccessor || typeof modelAccessor.findFirst !== 'function') {
@@ -39,6 +47,7 @@ export class IsUniqueConstraint implements ValidatorConstraintInterface {
     const whereCondition: { [key: string]: any } = {
       [field]: value,
     };
+
     if (
       excludeIdField &&
       args.object &&
@@ -57,7 +66,7 @@ export class IsUniqueConstraint implements ValidatorConstraintInterface {
       return !existingRecord;
     } catch (error) {
       console.error(
-        `IsUniqueConstraint: Database error checking uniqueness for field ${field}:`,
+        `IsUniqueConstraint: Database error checking uniqueness for ${model}.${field}:`,
         error,
       );
       return false;

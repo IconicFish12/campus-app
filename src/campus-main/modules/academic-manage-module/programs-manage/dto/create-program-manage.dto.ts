@@ -1,4 +1,4 @@
-import { Expose } from 'class-transformer';
+// import { Expose } from 'class-transformer';
 import {
   IsEnum,
   IsNotEmpty,
@@ -14,20 +14,20 @@ export class CreateProgramManageDto {
   @IsString({
     message: 'Program name is must be a text',
   })
-  @MaxLength(15, {
-    message: 'Program name must less than 15 character',
-  })
   @MinLength(4, {
     message: 'Program name must grater than 4 character',
   })
   @IsNotEmpty({
-    message: 'Departmnet name is cannot be empty',
+    message: 'Program name is cannot be empty',
   })
-  @Expose({ name: 'program_name' })
+  // @Expose({ name: 'program_name' })
   @IsUnique(
-    { model: 'programs', field: 'program_name' },
     {
-      message: 'The study program has been registered',
+      model: 'programs',
+      field: 'name',
+    },
+    {
+      message: 'Program Name is already registered',
     },
   )
   readonly name: string;
@@ -46,12 +46,15 @@ export class CreateProgramManageDto {
     message: 'Program code is cannot be empty',
   })
   @IsUnique(
-    { model: 'programs', field: 'program_code' },
     {
-      message: 'The study program code has been registered',
+      model: 'programs',
+      field: 'code',
+    },
+    {
+      message: 'Program code is already registered',
     },
   )
-  @Expose({ name: 'program_code' })
+  // @Expose({ name: 'program_code' })
   readonly code: string;
 
   // Program Level
@@ -74,6 +77,6 @@ export class CreateProgramManageDto {
   @IsUUID('4', {
     message: 'Department ID is Uuid version 4',
   })
-  @Expose({ name: 'department_id' })
+  // @Expose({ name: 'department_id' })
   readonly departmentId: string;
 }

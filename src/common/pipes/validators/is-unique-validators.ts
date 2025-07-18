@@ -1,7 +1,8 @@
 import { registerDecorator, ValidationOptions } from 'class-validator';
 import { IsUniqueConstraint } from './is-unique-constraint';
-import { CampusPrismaModelName } from './models/campus-model.prisma';
+import { CampusPrismaModelName } from './models/campus-prisma-models';
 
+// Interface untuk opsi yang bisa Anda berikan ke dekorator @IsUnique()
 interface IsUniqueDecoratorOptions {
   model: CampusPrismaModelName;
   field: string;
@@ -14,8 +15,6 @@ export function IsUnique(
 ) {
   return function (object: object, propertyName: string) {
     registerDecorator({
-      name: 'IsUnique',
-      async: true,
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,

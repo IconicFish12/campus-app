@@ -21,7 +21,7 @@ export class ProgramManageService {
       });
     } catch {
       throw new InternalServerErrorException(
-        `Error Acquired while creating Departement data`,
+        `Error Acquired while creating Study Program data`,
       );
     }
   }
@@ -43,7 +43,7 @@ export class ProgramManageService {
       });
     } catch {
       throw new InternalServerErrorException(
-        `Error Acquired while Getting All Departement data`,
+        `Error Acquired while Getting All Study Program data`,
       );
     }
   }
@@ -74,29 +74,30 @@ export class ProgramManageService {
       return data;
     } catch {
       throw new InternalServerErrorException(
-        `Error Acquired while Finding Departement data`,
+        `Error Acquired while Finding Study Program data`,
       );
     }
   }
 
   async update(id: string, request: UpdateProgramManageDto) {
     try {
-      await this.findOne(id);
+      const existData = await this.findOne(id);
 
       return await this.prisma.programs.update({
         where: {
           id: id,
         },
         data: {
-          name: request.name,
-          code: request.code,
-          level: request.level,
-          departmentId: request.departmentId,
+          name: request.name || existData.name,
+          code: request.code || existData.code,
+          level: request.level || existData.level,
+          departmentId: request.departmentId || existData.departmentId,
+          updatedAt: new Date(),
         },
       });
     } catch {
       throw new InternalServerErrorException(
-        `Error Acquired while Updating Departement data`,
+        `Error Acquired while Updating Study Program data`,
       );
     }
   }
@@ -112,9 +113,8 @@ export class ProgramManageService {
       });
     } catch {
       throw new InternalServerErrorException(
-        `Error Acquired while Deleting Departement data`,
+        `Error Acquired while Deleting Study Program data`,
       );
     }
-    return `This action removes a #${id} programManageModule`;
   }
 }

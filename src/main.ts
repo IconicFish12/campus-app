@@ -10,13 +10,17 @@ import {
 import { ResponseMappingInterceptor } from './common/interceptors/responseMapping.interceptor.js';
 import { CostumeValidationPipe } from './common/pipes/costume-validation.pipe.js';
 import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter.js';
+import { useContainer } from 'class-validator';
 // import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 // import { ConfigService } from '@nestjs/config';
 async function bootstrap() {
   const app = await NestFactory.create<INestApplication>(AppModule, {
     cors: true,
     bodyParser: true,
+    logger: ['error', 'warn', 'debug', 'verbose'],
   });
+
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -55,10 +59,7 @@ async function bootstrap() {
     }),
   );
   app.useGlobalInterceptors(new ResponseMappingInterceptor());
-  app.useGlobalPipes(
-    new ValidationPipe({ whitelist: true }),
-    new CostumeValidationPipe(),
-  );
+  app.useGlobalPipes(new CostumeValidationPipe());
   app.useGlobalFilters(new PrismaExceptionFilter());
 
   // Get The NestJS Configuration Service
@@ -81,9 +82,9 @@ async function bootstrap() {
   //     },
   //   },
   // };
-  // app.connectMicroservice<MicroserviceOptions>(rabbitMqMicroserviceOptions);
+  // const rabbit = app.connectMicroservice<MicroserviceOptions>(rabbitMqMicroserviceOptions);
 
-  // Cache Management System (Redis)
+  // Redis Message Broker and Cache Management System (Redis)
   // const redisMicroserviceOptions: MicroserviceOptions = {
   //   transport: Transport.REDIS,
   //   options: {
@@ -91,11 +92,14 @@ async function bootstrap() {
   //     port: configService.get<number>('REDIS_PORT') || 6379,
   //   },
   // };
-  // app.connectMicroservice<MicroserviceOptions>(redisMicroserviceOptions);
+  // const redis = app.connectMicroservice<MicroserviceOptions>(redisMicroserviceOptions);
 
   // await app.startAllMicroservices(); // Memulai semua listener microservice yang terhubung
   await app.listen(process.env.PORT || 3000); // Memulai server HTTP
   console.log(`HTTP Application is running on: ${await app.getUrl()}`);
-  console.log('All microservices listeners started.');
+
+  // if (rabbit.on() && redis.on){
+  //   console.log('All microservices listeners started.');
+  // }
 }
 void bootstrap();

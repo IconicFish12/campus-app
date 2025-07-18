@@ -5,7 +5,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { Expose } from 'class-transformer';
+// import { Expose } from 'class-transformer';
 import { IsUnique } from 'src/common/pipes/validators/is-unique-validators';
 
 export class CreateDepartmentManageDto {
@@ -20,11 +20,11 @@ export class CreateDepartmentManageDto {
     message: 'Department name must grater than 4 character',
   })
   @IsNotEmpty({
-    message: 'Departmnet name is cannot be empty',
+    message: 'Department name is cannot be empty',
   })
-  @Expose({ name: 'department_name' })
+  // @Expose({ name: 'department_name' })
   @IsUnique(
-    { model: 'departments', field: 'department_name' },
+    { model: 'departments', field: 'name' },
     {
       message: 'The study departments name has been registered',
     },
@@ -44,9 +44,9 @@ export class CreateDepartmentManageDto {
   @IsNotEmpty({
     message: 'Department code is cannot be empty',
   })
-  @Expose({ name: 'department_code' })
+  // @Expose({ name: 'department_code' })
   @IsUnique(
-    { model: 'departments', field: 'department_code' },
+    { model: 'departments', field: 'code' },
     {
       message: 'The study department code has been registered',
     },
@@ -61,6 +61,6 @@ export class CreateDepartmentManageDto {
     message: 'Department Decsiption is cannot be empty',
   })
   @IsOptional()
-  @Expose({ name: 'description' })
-  readonly desciption: string;
+  // @Expose({ name: 'description' })
+  readonly description: string;
 }

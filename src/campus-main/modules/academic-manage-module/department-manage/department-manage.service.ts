@@ -12,11 +12,12 @@ export class DepartmentManageService {
 
   async create(request: CreateDepartmentManageDto) {
     try {
+      console.log(`[REQUEST]: ${request.name} `);
       return await this.prisma.departments.create({
         data: {
           name: request.name,
           code: request.code,
-          description: request.desciption,
+          description: request.description,
         },
       });
     } catch {
@@ -30,6 +31,7 @@ export class DepartmentManageService {
     try {
       return await this.prisma.departments.findMany({
         include: {
+          _count: true,
           lecturers: true,
           programs: true,
         },
@@ -74,17 +76,18 @@ export class DepartmentManageService {
 
   async update(id: string, requestUpdate: UpdateDepartmentManageDto) {
     try {
-      await this.findOne(id);
+      const existData = await this.findOne(id);
 
       return this.prisma.departments.update({
         where: {
           id: id,
         },
         data: {
-          name: requestUpdate.name,
-          code: requestUpdate.code,
-          description: requestUpdate.desciption,
           id: id,
+          name: requestUpdate.name || existData.name,
+          code: requestUpdate.code || existData.code,
+          description: requestUpdate.description || existData.description,
+          updatedAt: new Date(),
         },
       });
     } catch (error) {
