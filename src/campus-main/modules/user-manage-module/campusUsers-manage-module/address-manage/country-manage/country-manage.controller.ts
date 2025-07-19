@@ -27,7 +27,7 @@ export class CountryManageController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.countryManageService.findOne(+id);
+    return this.countryManageService.findOne(id);
   }
 
   @Patch(':id')
@@ -35,11 +35,11 @@ export class CountryManageController {
     @Param('id') id: string,
     @Body() updateCountryManageDto: UpdateCountryManageDto,
   ) {
-    return this.countryManageService.update(+id, updateCountryManageDto);
+    return this.countryManageService.update(id, updateCountryManageDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.countryManageService.remove(+id);
+    return this.countryManageService.remove(id);
   }
 }

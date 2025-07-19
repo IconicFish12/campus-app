@@ -17,7 +17,7 @@ async function bootstrap() {
   const app = await NestFactory.create<INestApplication>(AppModule, {
     cors: true,
     bodyParser: true,
-    logger: ['error', 'warn', 'debug', 'verbose'],
+    // logger: ['error', 'warn', 'debug', 'verbose'],
   });
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
