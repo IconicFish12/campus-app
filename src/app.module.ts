@@ -4,7 +4,6 @@ import { RouterModule } from '@nestjs/core';
 import { CampusMainModule } from './campus-main/modules/campus-main.module';
 import { LmsManageModule } from './campus-lms/modules/lms-manage.module';
 import { CampusUsersManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/campusUsers-manage.module';
-import { AddressManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/address-manage/address-manage.module';
 import { RolesManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/roles-manage/roles-manage.module';
 import { UsersRolesManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/roles-manage/users-roles-manage/users-roles-manage.module';
 import { HrManageModule } from './campus-main/modules/user-manage-module/hr-manage-module/hr-manage.module';
@@ -22,13 +21,16 @@ import { AdmissionModule } from './campus-main/modules/admission-manage-module/a
 import { AttandanceModule } from './campus-main/modules/attandance-manage-module/attandance.module';
 import { CoursesModule } from './campus-main/modules/courses-manage-module/courses.module';
 import { ConfigModule } from '@nestjs/config';
-import { CountryManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/address-manage/country-manage/country-manage.module';
-import { CityManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/address-manage/city-manage/city-manage.module';
-import { StateManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/address-manage/country-state-manage/state-manage.module';
 import { ScheduleManageModule } from './campus-main/modules/timetable-manage-module/schedule-manage-module/schedule-manage.module';
 import { ClassScheduleModule } from './campus-main/modules/timetable-manage-module/schedule-manage-module/class-schedule/class-schedule.module';
 import { LecturesScheduleModule } from './campus-main/modules/timetable-manage-module/schedule-manage-module/lecturers-schedule/lectures-schedule.module';
 import { GeneralScheduleModule } from './campus-main/modules/timetable-manage-module/schedule-manage-module/general-schedule/general-schedule.module';
+import { LocationManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/location-manage-module/location-manage.module';
+import { AddressManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/location-manage-module/address-manage/address-manage.module';
+import { GeographicManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/location-manage-module/geographic-manage-module/geographic-manage.module';
+import { CountryManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/location-manage-module/geographic-manage-module/country-manage/country-manage.module';
+import { StateManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/location-manage-module/geographic-manage-module/country-state-manage/state-manage.module';
+import { CityManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/location-manage-module/geographic-manage-module/city-manage/city-manage.module';
 
 @Module({
   imports: [
@@ -49,12 +51,22 @@ import { GeneralScheduleModule } from './campus-main/modules/timetable-manage-mo
             module: CampusUsersManageModule,
             children: [
               {
-                path: 'addresses',
-                module: AddressManageModule,
+                path: 'locations',
+                module: LocationManageModule,
                 children: [
-                  { path: 'countries', module: CountryManageModule },
-                  { path: 'states', module: StateManageModule },
-                  { path: 'cities', module: CityManageModule },
+                  {
+                    path: 'addresses',
+                    module: AddressManageModule,
+                  },
+                  {
+                    path: 'geographics',
+                    module: GeographicManageModule,
+                    children: [
+                      { path: 'countries', module: CountryManageModule },
+                      { path: 'states', module: StateManageModule },
+                      { path: 'cities', module: CityManageModule },
+                    ],
+                  },
                 ],
               },
               {
