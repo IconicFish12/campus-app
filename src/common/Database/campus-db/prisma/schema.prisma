@@ -216,8 +216,8 @@ model Programs {
 
 model Courses {
   id                String             @id @default(uuid()) @db.Uuid
-  name        String             @unique @map("course_name")
-  code        String             @unique @map("course_code")
+  name              String             @unique @map("course_name")
+  code              String             @unique @map("course_code")
   credits           Float              @map("course_credit")
   programId         String             @map("program_id") @db.Uuid
   program           Programs           @relation(fields: [programId], references: [id], onUpdate: Cascade, onDelete: Cascade)
