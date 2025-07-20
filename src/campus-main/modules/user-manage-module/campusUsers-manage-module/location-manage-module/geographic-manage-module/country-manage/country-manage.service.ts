@@ -23,20 +23,14 @@ export class CountryManageService {
   async findAll() {
     try {
       return await this.prisma.country.findMany({
-        select: {
-          _count: true,
+        include: {
+          _count: { select: { states: true } },
           states: {
-            select: {
-              _count: true,
-            },
-            orderBy: {
-              createdAt: 'asc',
-            },
+            select: { id: true, name: true },
+            orderBy: { createdAt: 'asc' },
           },
         },
-        orderBy: {
-          createdAt: 'asc',
-        },
+        orderBy: { createdAt: 'asc' },
       });
     } catch {
       throw new InternalServerErrorException(
@@ -47,17 +41,13 @@ export class CountryManageService {
 
   async findOne(id: string) {
     try {
-      return await this.prisma.country.findFirst({
+      return await this.prisma.country.findUniqueOrThrow({
         where: { id: id },
         include: {
-          _count: true,
+          _count: { select: { states: true } },
           states: {
-            select: {
-              _count: true,
-            },
-            orderBy: {
-              createdAt: 'asc',
-            },
+            select: { id: true, name: true },
+            orderBy: { createdAt: 'asc' },
           },
         },
       });
@@ -70,12 +60,13 @@ export class CountryManageService {
 
   async update(id: string, updaterequest: UpdateCountryManageDto) {
     try {
+      await this.findOne(id);
+
       return await this.prisma.country.update({
-        where: {
-          id: id,
-        },
+        where: { id: id },
         data: {
           name: updaterequest.name,
+          updatedAt: new Date(),
         },
       });
     } catch {
@@ -87,10 +78,10 @@ export class CountryManageService {
 
   async remove(id: string) {
     try {
+      await this.findOne(id);
+
       return await this.prisma.country.delete({
-        where: {
-          id: id,
-        },
+        where: { id: id },
       });
     } catch {
       throw new InternalServerErrorException(

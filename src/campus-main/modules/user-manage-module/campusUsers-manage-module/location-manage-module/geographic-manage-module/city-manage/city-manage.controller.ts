@@ -27,7 +27,7 @@ export class CityManageController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.cityManageService.findOne(+id);
+    return this.cityManageService.findOne(id);
   }
 
   @Patch(':id')
@@ -35,11 +35,11 @@ export class CityManageController {
     @Param('id') id: string,
     @Body() updateCityManageDto: UpdateCityManageDto,
   ) {
-    return this.cityManageService.update(+id, updateCityManageDto);
+    return this.cityManageService.update(id, updateCityManageDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.cityManageService.remove(+id);
+    return this.cityManageService.remove(id);
   }
 }

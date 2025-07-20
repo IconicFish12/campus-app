@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
 } from '@nestjs/common';
 import { CreateStateManageDto } from './dto/create-state-manage.dto';
 import { UpdateStateManageDto } from './dto/update-state-manage.dto';
@@ -46,16 +45,18 @@ export class StateManageService {
     try {
       return await this.prisma.state.findMany({
         include: {
-          country: true,
-          _count: {
-            select: {
-              cities: true,
+          _count: { select: { cities: true } },
+          country: {
+            select: { id: true, name: true },
+          },
+          cities: {
+            select: { id: true, name: true },
+            orderBy: {
+              createdAt: 'asc',
             },
           },
         },
-        orderBy: {
-          createdAt: 'asc',
-        },
+        orderBy: { createdAt: 'asc' },
       });
     } catch {
       throw new InternalServerErrorException(
@@ -66,18 +67,19 @@ export class StateManageService {
 
   async findOne(id: string) {
     try {
-      const state = await this.prisma.state.findUnique({
+      const state = await this.prisma.state.findUniqueOrThrow({
         where: { id: id },
         include: {
-          country: { select: { id: true, name: true } },
           _count: { select: { cities: true } },
+          country: {
+            select: { id: true, name: true },
+          },
+          cities: {
+            select: { id: true, name: true },
+          },
         },
       });
-      if (!state) {
-        throw new NotFoundException(
-          `Province or country state with ID "${id}" is not found`,
-        );
-      }
+
       return state;
     } catch {
       throw new InternalServerErrorException(
@@ -96,7 +98,7 @@ export class StateManageService {
         });
         if (!countryExists) {
           throw new BadRequestException(
-            `country with ID "${updateRequest.countryId}" is not found`,
+            `Country with ID "${updateRequest.countryId}" is not found`,
           );
         }
       }
@@ -121,6 +123,7 @@ export class StateManageService {
   async remove(id: string) {
     try {
       await this.findOne(id);
+
       return await this.prisma.state.delete({
         where: { id: id },
       });
