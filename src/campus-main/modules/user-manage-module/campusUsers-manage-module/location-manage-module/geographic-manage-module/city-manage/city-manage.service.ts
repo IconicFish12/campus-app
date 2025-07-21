@@ -52,7 +52,7 @@ export class CityManageService {
             select: { addresses: true },
           },
         },
-        orderBy: { createdAt: 'asc' },
+        orderBy: { name: 'asc' },
       });
     } catch {
       throw new InternalServerErrorException(

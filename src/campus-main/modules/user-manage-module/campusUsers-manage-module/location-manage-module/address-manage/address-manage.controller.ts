@@ -27,7 +27,7 @@ export class AddressManageController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.addressManageService.findOne(+id);
+    return this.addressManageService.findOne(id);
   }
 
   @Patch(':id')
@@ -35,11 +35,11 @@ export class AddressManageController {
     @Param('id') id: string,
     @Body() updateAddressManageDto: UpdateAddressManageDto,
   ) {
-    return this.addressManageService.update(+id, updateAddressManageDto);
+    return this.addressManageService.update(id, updateAddressManageDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.addressManageService.remove(+id);
+    return this.addressManageService.remove(id);
   }
 }

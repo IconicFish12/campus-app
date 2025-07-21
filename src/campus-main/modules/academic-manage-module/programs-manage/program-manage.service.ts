@@ -9,14 +9,24 @@ import { CampusDbService } from 'src/common/Database/campus-db/campus-db.service
 @Injectable()
 export class ProgramManageService {
   constructor(private readonly prisma: CampusDbService) {}
-  async create(request: CreateProgramManageDto) {
+  async create(createRequest: CreateProgramManageDto) {
     try {
+      const departmentData = await this.prisma.departments.findUnique({
+        where: { id: createRequest.departmentId },
+      });
+
+      if (departmentData == null) {
+        throw new NotFoundException(
+          `Department data with ID ${createRequest.departmentId} is not found`,
+        );
+      }
+
       return await this.prisma.programs.create({
         data: {
-          name: request.name,
-          code: request.code,
-          level: request.level,
-          departmentId: request.departmentId,
+          name: createRequest.name,
+          code: createRequest.code,
+          level: createRequest.level,
+          department: { connect: { id: createRequest.departmentId } },
         },
       });
     } catch {
@@ -30,12 +40,21 @@ export class ProgramManageService {
     try {
       return await this.prisma.programs.findMany({
         include: {
-          _count: true,
-          admissionQuotas: true,
-          classes: true,
-          courses: true,
-          department: true,
-          students: true,
+          department: {
+            select: {
+              id: true,
+              name: true,
+              code: true,
+            },
+          },
+          _count: {
+            select: {
+              courses: true,
+              students: true,
+              admissionQuotas: true,
+              classes: true,
+            },
+          },
         },
         orderBy: {
           createdAt: 'asc',
@@ -50,20 +69,47 @@ export class ProgramManageService {
 
   async findOne(id: string) {
     try {
-      const data = await this.prisma.programs.findFirst({
+      const data = await this.prisma.programs.findUniqueOrThrow({
         where: {
           id: id,
         },
         include: {
-          _count: true,
-          admissionQuotas: true,
-          classes: true,
-          courses: true,
-          department: true,
-          students: true,
-        },
-        orderBy: {
-          createdAt: 'asc',
+          department: {
+            select: {
+              id: true,
+              name: true,
+              code: true,
+              description: true,
+            },
+          },
+          admissionQuotas: {
+            select: { id: true, academicYearId: true, quota: true },
+            orderBy: { academicYear: { year: 'desc' } },
+          },
+          classes: {
+            select: { id: true, className: true },
+            orderBy: { className: 'asc' },
+          },
+          courses: {
+            select: { id: true, name: true, code: true, credits: true },
+            orderBy: { name: 'asc' },
+          },
+          students: {
+            select: {
+              studentId: true,
+              nim: true,
+              user: { select: { firstName: true, lastName: true } },
+            },
+            orderBy: { user: { lastName: 'asc' } },
+          },
+          _count: {
+            select: {
+              courses: true,
+              students: true,
+              admissionQuotas: true,
+              classes: true,
+            },
+          },
         },
       });
 
@@ -79,19 +125,31 @@ export class ProgramManageService {
     }
   }
 
-  async update(id: string, request: UpdateProgramManageDto) {
+  async update(id: string, updateRequest: UpdateProgramManageDto) {
     try {
-      const existData = await this.findOne(id);
+      await this.findOne(id);
+
+      if (updateRequest.departmentId) {
+        const departmentData = await this.prisma.departments.findUnique({
+          where: { id: updateRequest.departmentId },
+        });
+
+        if (departmentData == null) {
+          throw new NotFoundException(
+            `Department data with ID ${updateRequest.departmentId} is not found`,
+          );
+        }
+      }
 
       return await this.prisma.programs.update({
         where: {
           id: id,
         },
         data: {
-          name: request.name || existData.name,
-          code: request.code || existData.code,
-          level: request.level || existData.level,
-          departmentId: request.departmentId || existData.departmentId,
+          name: updateRequest.name,
+          code: updateRequest.code,
+          level: updateRequest.level,
+          departmentId: updateRequest.departmentId,
           updatedAt: new Date(),
         },
       });
