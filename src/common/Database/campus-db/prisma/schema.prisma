@@ -98,8 +98,6 @@ model User {
   lastName       String      @map("last_name")
   middleName     String?     @map("middle_name")
   gender         Gender
-  addressId      String?     @unique @map("address_id") @db.Uuid
-  address        Address?    @relation(fields: [addressId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   status         Status      @default(ACTIVE)
   profilePicture String?     @map("profile_picture")
   isVerified     Boolean     @default(false) @map("is_verified")
@@ -109,17 +107,19 @@ model User {
   student        Student?
   userRoles      UserRoles[]
   employee       Employee?
+  Address        Address?
 
   @@map("users")
 }
 
 model Address {
-  id          String @id @default(uuid()) @db.Uuid
-  user        User?
-  fullAddress String @map("full_address")
-  cityId      String @map("city_id") @db.Uuid
-  city        City   @relation(fields: [cityId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  postalCode  Int?   @map("postal_code")
+  id          String  @id @default(uuid()) @db.Uuid
+  userId      String? @unique @map("user_id") @db.Uuid
+  user        User?   @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  fullAddress String  @map("full_address")
+  cityId      String  @map("city_id") @db.Uuid
+  city        City    @relation(fields: [cityId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  postalCode  Int?    @map("postal_code")
 
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamp()
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp()
