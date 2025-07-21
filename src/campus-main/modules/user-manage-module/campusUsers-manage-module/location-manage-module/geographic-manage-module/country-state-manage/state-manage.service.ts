@@ -52,11 +52,11 @@ export class StateManageService {
           cities: {
             select: { id: true, name: true },
             orderBy: {
-              createdAt: 'asc',
+              name: 'asc',
             },
           },
         },
-        orderBy: { createdAt: 'asc' },
+        orderBy: { name: 'asc' },
       });
     } catch {
       throw new InternalServerErrorException(
@@ -76,6 +76,7 @@ export class StateManageService {
           },
           cities: {
             select: { id: true, name: true },
+            orderBy: { name: 'asc' },
           },
         },
       });

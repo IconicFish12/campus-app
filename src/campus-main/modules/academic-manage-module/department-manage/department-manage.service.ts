@@ -12,7 +12,6 @@ export class DepartmentManageService {
 
   async create(request: CreateDepartmentManageDto) {
     try {
-      console.log(`[REQUEST]: ${request.name} `);
       return await this.prisma.departments.create({
         data: {
           name: request.name,
@@ -31,9 +30,22 @@ export class DepartmentManageService {
     try {
       return await this.prisma.departments.findMany({
         include: {
-          _count: true,
-          lecturers: true,
-          programs: true,
+          _count: { select: { programs: true, lecturers: true } },
+          programs: {
+            select: { id: true, name: true, code: true },
+            orderBy: { name: 'asc' },
+          },
+          lecturers: {
+            select: {
+              lecturerId: true,
+              nidn: true,
+              user: {
+                select: { firstName: true, lastName: true },
+              },
+              academicRank: true,
+            },
+            orderBy: { user: { firstName: 'asc' } },
+          },
         },
         orderBy: {
           createdAt: 'asc',
@@ -48,23 +60,29 @@ export class DepartmentManageService {
 
   async findOne(id: string) {
     try {
-      const department = await this.prisma.departments.findFirst({
+      const department = await this.prisma.departments.findUniqueOrThrow({
         where: {
           id: id,
         },
         include: {
-          _count: true,
-          lecturers: true,
-          programs: true,
-        },
-        orderBy: {
-          createdAt: 'asc',
+          _count: { select: { programs: true, lecturers: true } },
+          programs: {
+            select: { id: true, name: true, code: true },
+            orderBy: { name: 'asc' },
+          },
+          lecturers: {
+            select: {
+              lecturerId: true,
+              nidn: true,
+              user: {
+                select: { firstName: true, lastName: true },
+              },
+              academicRank: true,
+            },
+            orderBy: { user: { firstName: 'asc' } },
+          },
         },
       });
-
-      if (!department) {
-        throw new NotFoundException(`Department with ${id} is Not Found`);
-      }
 
       return department;
     } catch {
@@ -76,7 +94,7 @@ export class DepartmentManageService {
 
   async update(id: string, requestUpdate: UpdateDepartmentManageDto) {
     try {
-      const existData = await this.findOne(id);
+      await this.findOne(id);
 
       return this.prisma.departments.update({
         where: {
@@ -84,9 +102,9 @@ export class DepartmentManageService {
         },
         data: {
           id: id,
-          name: requestUpdate.name || existData.name,
-          code: requestUpdate.code || existData.code,
-          description: requestUpdate.description || existData.description,
+          name: requestUpdate.name,
+          code: requestUpdate.code,
+          description: requestUpdate.description,
           updatedAt: new Date(),
         },
       });

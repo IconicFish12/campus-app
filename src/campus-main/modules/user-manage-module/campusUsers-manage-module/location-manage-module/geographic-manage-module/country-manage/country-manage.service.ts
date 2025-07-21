@@ -30,7 +30,7 @@ export class CountryManageService {
             orderBy: { createdAt: 'asc' },
           },
         },
-        orderBy: { createdAt: 'asc' },
+        orderBy: { name: 'asc' },
       });
     } catch {
       throw new InternalServerErrorException(
@@ -47,7 +47,7 @@ export class CountryManageService {
           _count: { select: { states: true } },
           states: {
             select: { id: true, name: true },
-            orderBy: { createdAt: 'asc' },
+            orderBy: { name: 'asc' },
           },
         },
       });
