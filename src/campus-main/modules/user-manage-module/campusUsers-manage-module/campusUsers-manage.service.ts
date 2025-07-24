@@ -1,26 +1,91 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { CampusDbService } from 'src/common/Database/campus-db/campus-db.service';
 
 @Injectable()
 export class CampusUsersManageService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(private readonly prisma: CampusDbService) {}
+  async create(createRequest: CreateUserDto) {
+    try {
+      return await this.prisma.user.create({
+        data: {
+          firstName: createRequest.firstName,
+          middleName: createRequest.middleName,
+          lastName: createRequest.lastName,
+          email: createRequest.email,
+          password: createRequest.password,
+          status: createRequest.status,
+          gender: createRequest.gender,
+          profilePicture: createRequest.profilePicture,
+        },
+      });
+    } catch {
+      throw new InternalServerErrorException();
+    }
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll() {
+    try {
+      return await this.prisma.user.findMany({
+        include: {},
+        omit: {
+          password: true,
+        },
+        orderBy: {
+          createdAt: 'asc',
+        },
+      });
+    } catch {
+      throw new InternalServerErrorException();
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string) {
+    try {
+      return await this.prisma.user.findUniqueOrThrow({
+        where: { id: id },
+        include: {},
+        omit: {
+          password: true,
+        },
+      });
+    } catch {
+      throw new InternalServerErrorException();
+    }
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, updateRequest: UpdateUserDto) {
+    try {
+      return await this.prisma.user.update({
+        where: { id: id },
+        data: {
+          firstName: updateRequest.firstName,
+          middleName: updateRequest.middleName,
+          lastName: updateRequest.lastName,
+          email: updateRequest.email,
+          status: updateRequest.status,
+          gender: updateRequest.gender,
+          profilePicture: updateRequest.profilePicture,
+        },
+        omit: {
+          password: true,
+        },
+      });
+    } catch {
+      throw new InternalServerErrorException();
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string) {
+    try {
+      return this.prisma.user.delete({
+        where: { id: id },
+      });
+    } catch {
+      throw new InternalServerErrorException();
+    }
   }
+
+  async uploadFile() {}
 }

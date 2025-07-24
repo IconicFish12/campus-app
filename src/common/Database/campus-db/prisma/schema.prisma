@@ -93,20 +93,21 @@ enum AttendanceStatus {
 
 model User {
   id             String      @id @default(uuid()) @db.Uuid
-  email          String      @unique @map("email")
   firstName      String      @map("first_name")
   lastName       String      @map("last_name")
   middleName     String?     @map("middle_name")
+  email          String      @unique @map("email")
+  password       String      @unique @map("password")
   gender         Gender
   status         Status      @default(ACTIVE)
   profilePicture String?     @map("profile_picture")
   isVerified     Boolean     @default(false) @map("is_verified")
   createdAt      DateTime    @default(now()) @map("created_at") @db.Timestamp()
   updatedAt      DateTime    @updatedAt @map("updated_at") @db.Timestamp()
-  lecturer       Lecturer?
-  student        Student?
+  lecturer       Lecturer[]
+  student        Student[]
   userRoles      UserRoles[]
-  employee       Employee?
+  employee       Employee[]
   Address        Address?
 
   @@map("users")

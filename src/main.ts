@@ -4,6 +4,7 @@ import { AppModule } from './app.module.js';
 import {
   BadRequestException,
   INestApplication,
+  // Session,
   ValidationError,
   ValidationPipe,
 } from '@nestjs/common';
@@ -11,8 +12,11 @@ import { ResponseMappingInterceptor } from './common/interceptors/responseMappin
 import { CostumeValidationPipe } from './common/pipes/costume-validation.pipe.js';
 import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter.js';
 import { useContainer } from 'class-validator';
+// import cookieParser from 'cookie-parser';
+// import { doubleCsrf } from 'csrf-csrf';
 // import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 // import { ConfigService } from '@nestjs/config';
+
 async function bootstrap() {
   const app = await NestFactory.create<INestApplication>(AppModule, {
     cors: true,
@@ -20,7 +24,10 @@ async function bootstrap() {
     // logger: ['error', 'warn', 'debug', 'verbose'],
   });
 
-  useContainer(app.select(AppModule), { fallbackOnErrors: true });
+  // Using Nest JS inside Service
+  useContainer(app.select(AppModule, { abortOnError: true }), {
+    fallbackOnErrors: true,
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -57,12 +64,24 @@ async function bootstrap() {
         });
       },
     }),
+    new CostumeValidationPipe(),
   );
   app.useGlobalInterceptors(new ResponseMappingInterceptor());
-  app.useGlobalPipes(new CostumeValidationPipe());
   app.useGlobalFilters(new PrismaExceptionFilter());
 
-  // Get The NestJS Configuration Service
+  // # Security Service Session
+  // const {
+  //   // invalidCsrfTokenError,
+  //   // generateToken,
+  //   // validateRequest,
+  //   doubleCsrfProtection,
+  // } = doubleCsrf({  });
+
+  // app.use(Session());
+  // app.use(cookieParser);
+  // app.use(doubleCsrfProtection);
+
+  // # Get The NestJS Configuration Service
   // const configService = app.get(ConfigService);
 
   // Microservice App Starter (Listeners/Consumers)
