@@ -104,10 +104,10 @@ model User {
   isVerified     Boolean     @default(false) @map("is_verified")
   createdAt      DateTime    @default(now()) @map("created_at") @db.Timestamp()
   updatedAt      DateTime    @updatedAt @map("updated_at") @db.Timestamp()
-  lecturer       Lecturer[]
-  student        Student[]
+  lecturer       Lecturer?
+  student        Student?
+  employee       Employee?
   userRoles      UserRoles[]
-  employee       Employee[]
   Address        Address?
 
   @@map("users")
@@ -192,7 +192,6 @@ model Departments {
   description String?    @map("description") @db.Text
   createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamp()
   updatedAt   DateTime   @updatedAt @map("updated_at") @db.Timestamp()
-  lecturers   Lecturer[]
   programs    Programs[]
 
   @@map("departments")
@@ -211,6 +210,7 @@ model Programs {
   students        Student[]
   admissionQuotas AdmissionQuota[]
   classes         Class[]
+  Lecturer        Lecturer[]
 
   @@map("programs")
 }
@@ -237,8 +237,8 @@ model Lecturer {
   user              User                @relation(fields: [lecturerId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   nidn              String              @unique @map("nidn")
   academicRank      AcademicRank?       @map("academic_rank")
-  departmentId      String              @map("department_id") @db.Uuid
-  department        Departments?        @relation(fields: [departmentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  programId         String              @map("program_id") @db.Uuid
+  program           Programs?           @relation(fields: [programId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   employmentStatus  EmploymentStatus    @map("employment_status")
   specializations   Json?
   hireDate          DateTime            @map("hire_date") @db.Date

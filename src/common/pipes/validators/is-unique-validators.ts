@@ -1,5 +1,5 @@
 import { registerDecorator, ValidationOptions } from 'class-validator';
-import { IsUniqueConstraint } from './is-unique-constraint';
+import { IsUniqueConstraint } from './constraint/is-unique-constraint';
 import { CampusPrismaModelName } from './models/campus-prisma-models';
 
 // Interface untuk opsi yang bisa Anda berikan ke dekorator @IsUnique()

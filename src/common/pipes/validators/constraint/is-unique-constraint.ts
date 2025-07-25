@@ -6,7 +6,7 @@ import {
   ValidationArguments,
 } from 'class-validator';
 import { Injectable, Scope } from '@nestjs/common';
-import { CampusPrismaModelName } from './models/campus-prisma-models';
+import { CampusPrismaModelName } from '../models/campus-prisma-models';
 import { PrismaClient as GeneratedPrismaClient } from 'src/common/Database/campus-db/generated/campus-client';
 
 @ValidatorConstraint({ name: 'isUnique', async: true })

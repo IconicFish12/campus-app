@@ -6,39 +6,42 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsStrongPassword,
   MinLength,
 } from 'class-validator';
 import {
   Gender,
   Status,
 } from 'src/common/Database/campus-db/generated/campus-client';
+import { IsMatch } from 'src/common/pipes/validators/is-match-validator';
 import { IsUnique } from 'src/common/pipes/validators/is-unique-validators';
 
 export class CreateUserDto {
   @IsNotEmpty({
-    message: '',
+    message: 'User First Name must not empty',
   })
   @IsString({
-    message: '',
+    message: 'User First Name must be a text',
   })
-  @MinLength(4, {})
+  @MinLength(4, {
+    message: 'User First Name must greater than 4 character',
+  })
   readonly firstName: string;
 
-  @IsNotEmpty({
-    message: '',
-  })
   @IsOptional()
   @IsString({
-    message: '',
+    message: 'User Middle Name must be a text',
   })
-  @MinLength(4, {})
+  @MinLength(4, {
+    message: 'User Middle Name must greater than 4 character',
+  })
   readonly middleName: string;
 
   @IsNotEmpty({
-    message: '',
+    message: 'User Last Name must not empty',
   })
   @IsString({
-    message: '',
+    message: 'User Last Name must be a text',
   })
   @MinLength(4, {})
   readonly lastName: string;
@@ -86,9 +89,27 @@ export class CreateUserDto {
   @IsString({
     message: '',
   })
+  @IsStrongPassword(
+    {
+      minLength: 4,
+      minLowercase: 3,
+      minNumbers: 3,
+      minSymbols: 1,
+      minUppercase: 1,
+    },
+    {
+      groups: [''],
+    },
+  )
   readonly password: string;
 
-  readonly repeatPassword: string;
+  @IsString({
+    message: '',
+  })
+  @IsMatch('password', {
+    message: '',
+  })
+  readonly confirmPassword: string;
 
   @IsNotEmpty({
     message: '',
