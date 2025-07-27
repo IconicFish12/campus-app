@@ -9,9 +9,7 @@ export class CampusUsersManageService {
   constructor(private readonly prisma: CampusDbService) {}
   async create(createRequest: CreateUserDto) {
     try {
-      const hashedPassword = await this.passwordHashing(
-        createRequest.confirmPassword,
-      );
+      const hashedPassword = await this.passwordHashing(createRequest.password);
 
       return await this.prisma.user.create({
         data: {
@@ -20,19 +18,26 @@ export class CampusUsersManageService {
           lastName: createRequest.lastName,
           email: createRequest.email,
           password: hashedPassword,
-          status: createRequest.status,
           gender: createRequest.gender,
           profilePicture: createRequest.profilePicture,
         },
+        omit: {
+          password: true,
+        },
       });
     } catch {
-      throw new InternalServerErrorException();
+      throw new InternalServerErrorException(
+        'Error Acquired while Creating Campus User data',
+      );
     }
   }
 
   async findAll() {
     try {
       return await this.prisma.user.findMany({
+        where: {
+          // lecturer: { NOT: {  } },
+        },
         include: {
           Address: {
             select: {
@@ -56,7 +61,9 @@ export class CampusUsersManageService {
         },
       });
     } catch {
-      throw new InternalServerErrorException();
+      throw new InternalServerErrorException(
+        'Error Acquired While Getting Campus User data',
+      );
     }
   }
 
@@ -133,12 +140,16 @@ export class CampusUsersManageService {
         },
       });
     } catch {
-      throw new InternalServerErrorException();
+      throw new InternalServerErrorException(
+        'Error Acquired While Getting Campus User data',
+      );
     }
   }
 
   async update(id: string, updateRequest: UpdateUserDto) {
     try {
+      await this.findOne(id);
+
       return await this.prisma.user.update({
         where: { id: id },
         data: {
@@ -155,17 +166,23 @@ export class CampusUsersManageService {
         },
       });
     } catch {
-      throw new InternalServerErrorException();
+      throw new InternalServerErrorException(
+        'Error Acquired while Updating Campus User data',
+      );
     }
   }
 
   async remove(id: string) {
     try {
+      await this.findOne(id);
       return this.prisma.user.delete({
         where: { id: id },
       });
     } catch {
-      throw new InternalServerErrorException();
+      // errors.message;
+      throw new InternalServerErrorException(
+        'Error Acquired while Deleting Campus User data',
+      );
     }
   }
 

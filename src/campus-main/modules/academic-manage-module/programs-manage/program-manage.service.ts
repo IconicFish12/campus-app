@@ -149,7 +149,9 @@ export class ProgramManageService {
           name: updateRequest.name,
           code: updateRequest.code,
           level: updateRequest.level,
-          departmentId: updateRequest.departmentId,
+          department: updateRequest.departmentId
+            ? { connect: { id: updateRequest.departmentId } }
+            : undefined,
           updatedAt: new Date(),
         },
       });

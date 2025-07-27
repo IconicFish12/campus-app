@@ -21,6 +21,6 @@ export class IsMatchConstraint implements ValidatorConstraintInterface {
 
   defaultMessage(validationArguments: ValidationArguments): string {
     const [relatedPropertyName] = validationArguments.constraints;
-    return `${validationArguments.property} must match with ${relatedPropertyName}`;
+    return `${validationArguments.property} must match with ${relatedPropertyName} exactly`;
   }
 }

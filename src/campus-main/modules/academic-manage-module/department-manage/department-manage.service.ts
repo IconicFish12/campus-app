@@ -1,6 +1,7 @@
 import {
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateDepartmentManageDto } from './dto/create-department-manage.dto';
@@ -8,6 +9,7 @@ import { UpdateDepartmentManageDto } from './dto/update-department-manage.dto';
 import { CampusDbService } from 'src/common/Database/campus-db/campus-db.service';
 @Injectable()
 export class DepartmentManageService {
+  private readonly logger = new Logger(DepartmentManageService.name);
   constructor(private prisma: CampusDbService) {}
 
   async create(request: CreateDepartmentManageDto) {
@@ -30,25 +32,14 @@ export class DepartmentManageService {
     try {
       return await this.prisma.departments.findMany({
         include: {
-          _count: { select: { programs: true, lecturers: true } },
+          _count: { select: { programs: true } },
           programs: {
             select: { id: true, name: true, code: true },
             orderBy: { name: 'asc' },
           },
-          lecturers: {
-            select: {
-              lecturerId: true,
-              nidn: true,
-              user: {
-                select: { firstName: true, lastName: true },
-              },
-              academicRank: true,
-            },
-            orderBy: { user: { firstName: 'asc' } },
-          },
         },
         orderBy: {
-          createdAt: 'asc',
+          name: 'asc',
         },
       });
     } catch {
@@ -61,31 +52,25 @@ export class DepartmentManageService {
   async findOne(id: string) {
     try {
       const department = await this.prisma.departments.findUniqueOrThrow({
-        where: {
-          id: id,
-        },
+        where: { id: id },
         include: {
-          _count: { select: { programs: true, lecturers: true } },
+          _count: { select: { programs: true } },
           programs: {
             select: { id: true, name: true, code: true },
             orderBy: { name: 'asc' },
-          },
-          lecturers: {
-            select: {
-              lecturerId: true,
-              nidn: true,
-              user: {
-                select: { firstName: true, lastName: true },
-              },
-              academicRank: true,
-            },
-            orderBy: { user: { firstName: 'asc' } },
           },
         },
       });
 
       return department;
-    } catch {
+    } catch (error) {
+      if (error instanceof Error) {
+        this.logger.error(
+          `Error saat mencari departemen dengan ID ${id}: ${error.message}`,
+          error.stack,
+        );
+      }
+
       throw new InternalServerErrorException(
         `Error Acquired while Finding Departement data`,
       );

@@ -1,4 +1,4 @@
-import { Exclude } from 'class-transformer';
+// import { Exclude } from 'class-transformer';
 import {
   IsEmail,
   IsEnum,
@@ -7,6 +7,7 @@ import {
   IsOptional,
   IsString,
   IsStrongPassword,
+  MaxLength,
   MinLength,
 } from 'class-validator';
 import {
@@ -18,7 +19,7 @@ import { IsUnique } from 'src/common/pipes/validators/is-unique-validators';
 
 export class CreateUserDto {
   @IsNotEmpty({
-    message: 'User First Name must not empty',
+    message: 'User First Name cannot be empty',
   })
   @IsString({
     message: 'User First Name must be a text',
@@ -38,7 +39,7 @@ export class CreateUserDto {
   readonly middleName: string;
 
   @IsNotEmpty({
-    message: 'User Last Name must not empty',
+    message: 'User Last Name cannot be empty',
   })
   @IsString({
     message: 'User Last Name must be a text',
@@ -47,16 +48,15 @@ export class CreateUserDto {
   readonly lastName: string;
 
   @IsNotEmpty({
-    message: '',
+    message: 'Email cannot be empty',
   })
   @IsEmail(
     {
       ignore_max_length: true,
       allow_display_name: true,
-      require_display_name: true,
     },
     {
-      message: '',
+      message: 'Email field must be an valid email',
     },
   )
   @IsUnique(
@@ -65,65 +65,54 @@ export class CreateUserDto {
       field: 'email',
     },
     {
-      message: '',
+      message: 'Email has been registered',
     },
   )
   @IsString({
-    message: '',
+    message: 'Email must be an text',
   })
   readonly email: string;
 
   @IsNotEmpty({
-    message: '',
-  })
-  @IsUnique(
-    {
-      model: 'user',
-      field: 'password',
-    },
-    {
-      message: '',
-    },
-  )
-  @Exclude()
-  @IsString({
-    message: '',
+    message: 'Password cannot be empty',
   })
   @IsStrongPassword(
     {
       minLength: 4,
-      minLowercase: 3,
+      minLowercase: 1,
       minNumbers: 3,
       minSymbols: 1,
       minUppercase: 1,
     },
     {
-      groups: [''],
+      message:
+        'Password must be at least 4 characters long, 3 numbers, and 1 symbol.',
     },
   )
+  @MaxLength(10, {
+    message: 'Password must less than 10 characters',
+  })
   readonly password: string;
 
-  @IsString({
-    message: '',
+  @IsNotEmpty({
+    message: 'the confirm password cannot be empty ',
   })
   @IsMatch('password', {
-    message: '',
+    message: 'the confirm password must match with the password',
   })
   readonly confirmPassword: string;
 
   @IsNotEmpty({
-    message: '',
+    message: 'the Gender cannot be empty',
   })
   @IsEnum(Gender, {
-    message: '',
+    message: 'User Gender is Not valid, Choose between MALE, FEMALE and OTHER',
   })
   readonly gender: Gender;
 
-  @IsNotEmpty({
-    message: '',
-  })
   @IsEnum(Status, {
-    message: '',
+    message:
+      'User Statue is Not Valid, Choose between ACTIVE, INACTIVE, and SUSPENDED',
   })
   readonly status: Status;
 

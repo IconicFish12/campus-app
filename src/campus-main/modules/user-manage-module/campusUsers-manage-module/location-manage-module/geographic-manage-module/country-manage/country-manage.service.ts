@@ -26,7 +26,14 @@ export class CountryManageService {
         include: {
           _count: { select: { states: true } },
           states: {
-            select: { id: true, name: true },
+            select: {
+              id: true,
+              name: true,
+              cities: {
+                select: { id: true, name: true },
+                orderBy: { name: 'asc' },
+              },
+            },
             orderBy: { createdAt: 'asc' },
           },
         },
@@ -46,8 +53,15 @@ export class CountryManageService {
         include: {
           _count: { select: { states: true } },
           states: {
-            select: { id: true, name: true },
-            orderBy: { name: 'asc' },
+            select: {
+              id: true,
+              name: true,
+              cities: {
+                select: { id: true, name: true },
+                orderBy: { name: 'asc' },
+              },
+            },
+            orderBy: { createdAt: 'asc' },
           },
         },
       });

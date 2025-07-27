@@ -204,13 +204,13 @@ model Programs {
   level           ProgramLevel     @map("program_level")
   departmentId    String           @map("department_id") @db.Uuid
   department      Departments      @relation(fields: [departmentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  courses         Courses[]
   createdAt       DateTime         @default(now()) @map("created_at") @db.Timestamp()
   updatedAt       DateTime         @updatedAt @map("updated_at") @db.Timestamp()
   students        Student[]
   admissionQuotas AdmissionQuota[]
   classes         Class[]
-  Lecturer        Lecturer[]
+  lecturers        Lecturer[]
+  courses         Courses[]
 
   @@map("programs")
 }
@@ -238,7 +238,7 @@ model Lecturer {
   nidn              String              @unique @map("nidn")
   academicRank      AcademicRank?       @map("academic_rank")
   programId         String              @map("program_id") @db.Uuid
-  program           Programs?           @relation(fields: [programId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  program           Programs            @relation(fields: [programId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   employmentStatus  EmploymentStatus    @map("employment_status")
   specializations   Json?
   hireDate          DateTime            @map("hire_date") @db.Date

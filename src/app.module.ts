@@ -31,6 +31,7 @@ import { GeographicManageModule } from './campus-main/modules/user-manage-module
 import { CountryManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/location-manage-module/geographic-manage-module/country-manage/country-manage.module';
 import { StateManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/location-manage-module/geographic-manage-module/country-state-manage/state-manage.module';
 import { CityManageModule } from './campus-main/modules/user-manage-module/campusUsers-manage-module/location-manage-module/geographic-manage-module/city-manage/city-manage.module';
+import { UserManageModule } from './campus-main/modules/user-manage-module/user-manage.module';
 
 @Module({
   imports: [
@@ -48,7 +49,7 @@ import { CityManageModule } from './campus-main/modules/user-manage-module/campu
         children: [
           {
             path: 'users-manage',
-            module: CampusUsersManageModule,
+            module: UserManageModule,
             children: [
               {
                 path: 'locations',
@@ -75,6 +76,10 @@ import { CityManageModule } from './campus-main/modules/user-manage-module/campu
                 children: [
                   { path: 'user-assignments', module: UsersRolesManageModule },
                 ],
+              },
+              {
+                path: 'campus-users',
+                module: CampusUsersManageModule,
               },
             ],
           },

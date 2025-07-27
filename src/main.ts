@@ -21,7 +21,7 @@ async function bootstrap() {
   const app = await NestFactory.create<INestApplication>(AppModule, {
     cors: true,
     bodyParser: true,
-    // logger: ['error', 'warn', 'debug', 'verbose'],
+    logger: ['error', 'warn', 'debug', 'verbose'],
   });
 
   // Using Nest JS inside Service
@@ -59,7 +59,7 @@ async function bootstrap() {
         const formattedValidationErrors = formatErrors(validationErrors);
 
         return new BadRequestException({
-          message: 'Validasi input gagal',
+          message: 'Input Validation is Failed',
           errors: formattedValidationErrors,
         });
       },
