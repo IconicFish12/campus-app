@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUsersRolesManageDto } from './dto/create-users-roles-manage.dto';
+import { CreateUsersRolesManageDto } from '../../../../../util/dto/create-request/create-users-roles-manage.dto';
 import { UpdateUsersRolesManageDto } from './dto/update-users-roles-manage.dto';
 
 @Injectable()

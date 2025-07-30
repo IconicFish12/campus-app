@@ -3,7 +3,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateAddressManageDto } from './dto/create-address-manage.dto';
+import { CreateAddressManageDto } from '../../../../../util/dto/create-request/create-address-manage.dto';
 import { UpdateAddressManageDto } from './dto/update-address-manage.dto';
 import { CampusDbService } from 'src/common/Database/campus-db/campus-db.service';
 

@@ -8,7 +8,7 @@ import {
   Delete,
 } from '@nestjs/common';
 import { ProgramManageService } from './program-manage.service';
-import { CreateProgramManageDto } from './dto/create-program-manage.dto';
+import { CreateProgramManageDto } from '../../../util/dto/create-request/create-program-manage.dto';
 import { UpdateProgramManageDto } from './dto/update-program-manage.dto';
 
 @Controller()

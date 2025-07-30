@@ -8,7 +8,7 @@ import {
   Delete,
 } from '@nestjs/common';
 import { CampusUsersManageService } from './campusUsers-manage.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from '../../../util/dto/create-request/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller()

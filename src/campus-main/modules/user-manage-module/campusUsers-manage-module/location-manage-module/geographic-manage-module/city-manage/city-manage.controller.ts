@@ -8,7 +8,7 @@ import {
   Delete,
 } from '@nestjs/common';
 import { CityManageService } from './city-manage.service';
-import { CreateCityManageDto } from './dto/create-city-manage.dto';
+import { CreateCityManageDto } from '../../../../../../util/dto/create-request/create-city-manage.dto';
 import { UpdateCityManageDto } from './dto/update-city-manage.dto';
 
 @Controller()

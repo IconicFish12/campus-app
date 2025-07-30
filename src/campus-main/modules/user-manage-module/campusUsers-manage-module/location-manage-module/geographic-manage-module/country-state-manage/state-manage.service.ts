@@ -3,7 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { CreateStateManageDto } from './dto/create-state-manage.dto';
+import { CreateStateManageDto } from '../../../../../../util/dto/create-request/create-state-manage.dto';
 import { UpdateStateManageDto } from './dto/update-state-manage.dto';
 import { CampusDbService } from 'src/common/Database/campus-db/campus-db.service';
 

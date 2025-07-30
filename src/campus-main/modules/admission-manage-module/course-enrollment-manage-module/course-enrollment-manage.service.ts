@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateCourseEnrollmentManageDto } from './dto/create-course-enrollment-manage.dto';
+import { CreateCourseEnrollmentManageDto } from '../../../util/dto/create-request/create-course-enrollment-manage.dto';
 import { UpdateCourseEnrollmentManageDto } from './dto/update-course-enrollment-manage.dto';
 
 @Injectable()

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAcademyYearDto } from './dto/create-academy-year.dto';
+import { CreateAcademyYearDto } from '../../../../util/dto/create-request/create-academy-year.dto';
 import { UpdateAcademyYearDto } from './dto/update-academy-year.dto';
 
 @Injectable()

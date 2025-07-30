@@ -8,7 +8,7 @@ import {
   Delete,
 } from '@nestjs/common';
 import { SemesterService } from './semester.service';
-import { CreateSemesterDto } from './dto/create-semester.dto';
+import { CreateSemesterDto } from '../../../../util/dto/create-request/create-semester.dto';
 import { UpdateSemesterDto } from './dto/update-semester.dto';
 
 @Controller()

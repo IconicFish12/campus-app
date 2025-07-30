@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateClassScheduleDto } from './dto/create-class-schedule.dto';
+import { CreateClassScheduleDto } from '../../../../util/dto/create-request/create-class-schedule.dto';
 import { UpdateClassScheduleDto } from './dto/update-class-schedule.dto';
 
 @Injectable()

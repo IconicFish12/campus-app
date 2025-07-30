@@ -8,7 +8,7 @@ import {
   Delete,
 } from '@nestjs/common';
 import { QuotaManageService } from './quota-manage.service';
-import { CreateQuotaManageDto } from './dto/create-quota-manage.dto';
+import { CreateQuotaManageDto } from '../../../util/dto/create-request/create-quota-manage.dto';
 import { UpdateQuotaManageDto } from './dto/update-quota-manage.dto';
 
 @Controller()

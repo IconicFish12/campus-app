@@ -4,7 +4,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateDepartmentManageDto } from './dto/create-department-manage.dto';
+import { CreateDepartmentManageDto } from '../../../util/dto/create-request/create-department-manage.dto';
 import { UpdateDepartmentManageDto } from './dto/update-department-manage.dto';
 import { CampusDbService } from 'src/common/Database/campus-db/campus-db.service';
 @Injectable()

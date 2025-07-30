@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from '../../../util/dto/create-request/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CampusDbService } from 'src/common/Database/campus-db/campus-db.service';
 import bcrypt from 'bcrypt';

@@ -3,7 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { CreateCityManageDto } from './dto/create-city-manage.dto';
+import { CreateCityManageDto } from '../../../../../../util/dto/create-request/create-city-manage.dto';
 import { UpdateCityManageDto } from './dto/update-city-manage.dto';
 import { CampusDbService } from 'src/common/Database/campus-db/campus-db.service';
 

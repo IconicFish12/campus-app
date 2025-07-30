@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { CreateCountryManageDto } from './dto/create-country-manage.dto';
+import { CreateCountryManageDto } from '../../../../../../util/dto/create-request/create-country-manage.dto';
 import { UpdateCountryManageDto } from './dto/update-country-manage.dto';
 import { CampusDbService } from 'src/common/Database/campus-db/campus-db.service';
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateGeneralScheduleDto } from './dto/create-general-schedule.dto';
+import { CreateGeneralScheduleDto } from '../../../../util/dto/create-request/create-general-schedule.dto';
 import { UpdateGeneralScheduleDto } from './dto/update-general-schedule.dto';
 
 @Injectable()

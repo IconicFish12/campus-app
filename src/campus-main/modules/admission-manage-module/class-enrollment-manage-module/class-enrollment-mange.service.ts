@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateClassEnrollmentManageDto } from './dto/create-class-enrollment-mange.dto';
+import { CreateClassEnrollmentManageDto } from '../../../util/dto/create-request/create-class-enrollment-mange.dto';
 import { UpdateClassEnrollmentManageDto } from './dto/update-class-enrollment-mange.dto';
 
 @Injectable()
