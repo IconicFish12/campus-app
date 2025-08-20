@@ -209,7 +209,7 @@ model Programs {
   students        Student[]
   admissionQuotas AdmissionQuota[]
   classes         Class[]
-  lecturers        Lecturer[]
+  lecturers       Lecturer[]
   courses         Courses[]
 
   @@map("programs")

@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ProgramManageService } from './program-manage.service';
 import { CreateProgramManageDto } from '../../../util/dto/create-request/create-program-manage.dto';
-import { UpdateProgramManageDto } from './dto/update-program-manage.dto';
+import { UpdateProgramManageDto } from '../../../util/dto/update-request/update-program-manage.dto';
 
 @Controller()
 export class ProgramManageController {

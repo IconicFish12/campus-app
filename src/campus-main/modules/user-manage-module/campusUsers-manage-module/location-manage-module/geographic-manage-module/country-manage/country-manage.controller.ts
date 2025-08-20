@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { CountryManageService } from './country-manage.service';
 import { CreateCountryManageDto } from '../../../../../../util/dto/create-request/create-country-manage.dto';
-import { UpdateCountryManageDto } from './dto/update-country-manage.dto';
+import { UpdateCountryManageDto } from '../../../../../../util/dto/update-request/update-country-manage.dto';
 
 @Controller()
 export class CountryManageController {

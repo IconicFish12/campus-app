@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { CreateStudentDto } from '../../../util/dto/create-request/create-student.dto';
-import { UpdateStudentDto } from './dto/update-student.dto';
+import { UpdateStudentDto } from '../../../util/dto/update-request/update-student.dto';
 
 @Controller()
 export class StudentController {

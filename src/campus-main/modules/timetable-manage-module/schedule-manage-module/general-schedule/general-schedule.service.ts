@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateGeneralScheduleDto } from '../../../../util/dto/create-request/create-general-schedule.dto';
-import { UpdateGeneralScheduleDto } from './dto/update-general-schedule.dto';
+import { UpdateGeneralScheduleDto } from '../../../../util/dto/update-request/update-general-schedule.dto';
 
 @Injectable()
 export class GeneralScheduleService {

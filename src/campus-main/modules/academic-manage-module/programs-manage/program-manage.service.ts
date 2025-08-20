@@ -4,8 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateProgramManageDto } from '../../../util/dto/create-request/create-program-manage.dto';
-import { UpdateProgramManageDto } from './dto/update-program-manage.dto';
-import { CampusDbService } from 'src/common/Database/campus-db/campus-db.service';
+import { UpdateProgramManageDto } from '../../../util/dto/update-request/update-program-manage.dto';
+import { CampusDbService } from '../../../../common/Database/campus-db/campus-db.service';
 @Injectable()
 export class ProgramManageService {
   constructor(private readonly prisma: CampusDbService) {}

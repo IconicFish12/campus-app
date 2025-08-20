@@ -4,8 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateAddressManageDto } from '../../../../../util/dto/create-request/create-address-manage.dto';
-import { UpdateAddressManageDto } from './dto/update-address-manage.dto';
-import { CampusDbService } from 'src/common/Database/campus-db/campus-db.service';
+import { UpdateAddressManageDto } from '../../../../../util/dto/update-request/update-address-manage.dto';
+import { CampusDbService } from '../../../../../../common/Database/campus-db/campus-db.service';
 
 @Injectable()
 export class AddressManageService {

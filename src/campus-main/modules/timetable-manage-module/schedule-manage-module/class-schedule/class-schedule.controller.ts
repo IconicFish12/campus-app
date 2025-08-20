@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ClassScheduleService } from './class-schedule.service';
 import { CreateClassScheduleDto } from '../../../../util/dto/create-request/create-class-schedule.dto';
-import { UpdateClassScheduleDto } from './dto/update-class-schedule.dto';
+import { UpdateClassScheduleDto } from '../../../../util/dto/update-request/update-class-schedule.dto';
 
 @Controller()
 export class ClassScheduleController {

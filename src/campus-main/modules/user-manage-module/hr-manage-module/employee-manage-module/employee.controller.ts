@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from '../../../../util/dto/create-request/create-employee.dto';
-import { UpdateEmployeeDto } from './dto/update-employee.dto';
+import { UpdateEmployeeDto } from '../../../../util/dto/update-request/update-employee.dto';
 
 @Controller()
 export class EmployeeController {

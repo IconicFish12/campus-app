@@ -5,8 +5,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateDepartmentManageDto } from '../../../util/dto/create-request/create-department-manage.dto';
-import { UpdateDepartmentManageDto } from './dto/update-department-manage.dto';
-import { CampusDbService } from 'src/common/Database/campus-db/campus-db.service';
+import { UpdateDepartmentManageDto } from '../../../util/dto/update-request/update-department-manage.dto';
+import { CampusDbService } from '../../../../common/Database/campus-db/campus-db.service';
 @Injectable()
 export class DepartmentManageService {
   private readonly logger = new Logger(DepartmentManageService.name);

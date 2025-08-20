@@ -4,8 +4,8 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { CreateCityManageDto } from '../../../../../../util/dto/create-request/create-city-manage.dto';
-import { UpdateCityManageDto } from './dto/update-city-manage.dto';
-import { CampusDbService } from 'src/common/Database/campus-db/campus-db.service';
+import { UpdateCityManageDto } from '../../../../../../util/dto/update-request/update-city-manage.dto';
+import { CampusDbService } from '../../../../../../../common/Database/campus-db/campus-db.service';
 
 @Injectable()
 export class CityManageService {

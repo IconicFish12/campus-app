@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { UsersRolesManageService } from './users-roles-manage.service';
 import { CreateUsersRolesManageDto } from '../../../../../util/dto/create-request/create-users-roles-manage.dto';
-import { UpdateUsersRolesManageDto } from './dto/update-users-roles-manage.dto';
+import { UpdateUsersRolesManageDto } from '../../../../../util/dto/update-request/update-users-roles-manage.dto';
 
 @Controller('users-roles-manage')
 export class UsersRolesManageController {

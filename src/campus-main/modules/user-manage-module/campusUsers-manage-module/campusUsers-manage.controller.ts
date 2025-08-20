@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { CampusUsersManageService } from './campusUsers-manage.service';
 import { CreateUserDto } from '../../../util/dto/create-request/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserDto } from '../../../util/dto/update-request/update-user.dto';
 
 @Controller()
 export class CampusUsersManageController {

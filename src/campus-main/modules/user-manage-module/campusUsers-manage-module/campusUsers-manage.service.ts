@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateUserDto } from '../../../util/dto/create-request/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserDto } from '../../../util/dto/update-request/update-user.dto';
 import { CampusDbService } from 'src/common/Database/campus-db/campus-db.service';
 import bcrypt from 'bcrypt';
 
@@ -160,6 +160,7 @@ export class CampusUsersManageService {
           status: updateRequest.status,
           gender: updateRequest.gender,
           profilePicture: updateRequest.profilePicture,
+          updatedAt: new Date(),
         },
         omit: {
           password: true,

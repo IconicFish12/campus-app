@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateClassEnrollmentManageDto } from '../../../util/dto/create-request/create-class-enrollment-mange.dto';
-import { UpdateClassEnrollmentManageDto } from './dto/update-class-enrollment-mange.dto';
+import { UpdateClassEnrollmentManageDto } from '../../../util/dto/update-request//update-class-enrollment-mange.dto';
 
 @Injectable()
 export class ClassEnrollmentManageService {

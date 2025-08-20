@@ -4,8 +4,8 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { CreateStateManageDto } from '../../../../../../util/dto/create-request/create-state-manage.dto';
-import { UpdateStateManageDto } from './dto/update-state-manage.dto';
-import { CampusDbService } from 'src/common/Database/campus-db/campus-db.service';
+import { UpdateStateManageDto } from '../../../../../../util/dto/update-request/update-state-manage.dto';
+import { CampusDbService } from '../../../../../../../common/Database/campus-db/campus-db.service';
 
 @Injectable()
 export class StateManageService {

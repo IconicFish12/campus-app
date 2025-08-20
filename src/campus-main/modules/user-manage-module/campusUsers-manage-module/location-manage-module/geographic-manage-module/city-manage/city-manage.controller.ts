@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { CityManageService } from './city-manage.service';
 import { CreateCityManageDto } from '../../../../../../util/dto/create-request/create-city-manage.dto';
-import { UpdateCityManageDto } from './dto/update-city-manage.dto';
+import { UpdateCityManageDto } from '../../../../../../util/dto/update-request/update-city-manage.dto';
 
 @Controller()
 export class CityManageController {
