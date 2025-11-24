@@ -8,8 +8,8 @@ import {
   Delete,
 } from '@nestjs/common';
 import { AddressManageService } from './address-manage.service';
-import { CreateAddressManageDto } from './dto/create-address-manage.dto';
-import { UpdateAddressManageDto } from './dto/update-address-manage.dto';
+import { CreateAddressManageDto } from '../../../../../util/dto/create-request/create-address-manage.dto';
+import { UpdateAddressManageDto } from '../../../../../util/dto/update-request/update-address-manage.dto';
 
 @Controller()
 export class AddressManageController {

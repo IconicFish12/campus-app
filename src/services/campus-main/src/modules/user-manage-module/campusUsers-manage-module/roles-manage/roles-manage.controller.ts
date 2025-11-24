@@ -8,8 +8,8 @@ import {
   Delete,
 } from '@nestjs/common';
 import { RolesManageService } from './roles-manage.service';
-import { CreateRolesManageDto } from './dto/create-roles-manage.dto';
-import { UpdateRolesManageDto } from './dto/update-roles-manage.dto';
+import { CreateRolesManageDto } from '../../../../util/dto/create-request/create-roles-manage.dto';
+import { UpdateRolesManageDto } from '../../../../util/dto/update-request/update-roles-manage.dto';
 
 @Controller()
 export class RolesManageController {

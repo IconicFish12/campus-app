@@ -8,8 +8,8 @@ import {
   Delete,
 } from '@nestjs/common';
 import { AttandanceService } from './attandance.service';
-import { CreateAttandanceDto } from './dto/create-attandance.dto';
-import { UpdateAttandanceDto } from './dto/update-attandance.dto';
+import { CreateAttandanceDto } from '../../util/dto/create-request/create-attandance.dto';
+import { UpdateAttandanceDto } from '../../util/dto/update-request/update-attandance.dto';
 
 @Controller()
 export class AttandanceController {

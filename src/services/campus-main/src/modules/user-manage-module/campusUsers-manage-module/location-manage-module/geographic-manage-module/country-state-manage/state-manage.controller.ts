@@ -8,8 +8,8 @@ import {
   Delete,
 } from '@nestjs/common';
 import { StateManageService } from './state-manage.service';
-import { CreateStateManageDto } from './dto/create-state-manage.dto';
-import { UpdateStateManageDto } from './dto/update-state-manage.dto';
+import { CreateStateManageDto } from '../../../../../../util/dto/create-request/create-state-manage.dto';
+import { UpdateStateManageDto } from '../../../../../../util/dto/update-request/update-state-manage.dto';
 
 @Controller()
 export class StateManageController {

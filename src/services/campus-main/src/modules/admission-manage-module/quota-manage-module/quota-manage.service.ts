@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateQuotaManageDto } from './dto/create-quota-manage.dto';
-import { UpdateQuotaManageDto } from './dto/update-quota-manage.dto';
+import { CreateQuotaManageDto } from '../../../util/dto/create-request/create-quota-manage.dto';
+import { UpdateQuotaManageDto } from '../../../util/dto/update-request/update-quota-manage.dto';
 
 @Injectable()
 export class QuotaManageService {

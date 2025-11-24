@@ -4,15 +4,18 @@ import { AdmissionController } from './admission.controller';
 import { ClassEnrollmentMangeModule } from './class-enrollment-manage-module/class-enrollment-mange.module';
 import { CourseEnrollmentManageModule } from './course-enrollment-manage-module/course-enrollment-manage.module';
 import { StudentEnrollmentManageModule } from './student-enrollment-manage-module/student-enrollment-manage.module';
+import { CampusDbModule } from 'src/common/Database/campus-db/campus-db.module';
+import { CampusDbService } from 'src/common/Database/campus-db/campus-db.service';
 
 @Module({
   imports: [
     ClassEnrollmentMangeModule,
     CourseEnrollmentManageModule,
     StudentEnrollmentManageModule,
+    CampusDbModule,
   ],
   controllers: [AdmissionController],
-  providers: [AdmissionService],
+  providers: [AdmissionService, CampusDbService],
   exports: [
     AdmissionService,
     ClassEnrollmentMangeModule,

@@ -8,8 +8,8 @@ import {
   Delete,
 } from '@nestjs/common';
 import { CampusUsersManageService } from './campusUsers-manage.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto } from '../../../util/dto/create-request/create-user.dto';
+import { UpdateUserDto } from '../../../util/dto/update-request/update-user.dto';
 
 @Controller()
 export class CampusUsersManageController {
@@ -27,16 +27,16 @@ export class CampusUsersManageController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+    return this.usersService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+    return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+    return this.usersService.remove(id);
   }
 }

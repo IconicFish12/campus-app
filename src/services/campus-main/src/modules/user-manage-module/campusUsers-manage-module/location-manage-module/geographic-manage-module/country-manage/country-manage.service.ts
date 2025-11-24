@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { CreateCountryManageDto } from './dto/create-country-manage.dto';
-import { UpdateCountryManageDto } from './dto/update-country-manage.dto';
-import { CampusDbService } from 'src/common/Database/campus-db/campus-db.service';
+import { CreateCountryManageDto } from '../../../../../../util/dto/create-request/create-country-manage.dto';
+import { UpdateCountryManageDto } from '../../../../../../util/dto/update-request/update-country-manage.dto';
+import { CampusDbService } from '../../../../../../../common/Database/campus-db/campus-db.service';
 
 @Injectable()
 export class CountryManageService {
@@ -26,7 +26,14 @@ export class CountryManageService {
         include: {
           _count: { select: { states: true } },
           states: {
-            select: { id: true, name: true },
+            select: {
+              id: true,
+              name: true,
+              cities: {
+                select: { id: true, name: true },
+                orderBy: { name: 'asc' },
+              },
+            },
             orderBy: { createdAt: 'asc' },
           },
         },
@@ -46,8 +53,15 @@ export class CountryManageService {
         include: {
           _count: { select: { states: true } },
           states: {
-            select: { id: true, name: true },
-            orderBy: { name: 'asc' },
+            select: {
+              id: true,
+              name: true,
+              cities: {
+                select: { id: true, name: true },
+                orderBy: { name: 'asc' },
+              },
+            },
+            orderBy: { createdAt: 'asc' },
           },
         },
       });

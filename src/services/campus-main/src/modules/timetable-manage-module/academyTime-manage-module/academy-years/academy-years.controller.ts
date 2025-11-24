@@ -8,8 +8,8 @@ import {
   Delete,
 } from '@nestjs/common';
 import { AcademyYearsService } from './academy-years.service';
-import { CreateAcademyYearDto } from './dto/create-academy-year.dto';
-import { UpdateAcademyYearDto } from './dto/update-academy-year.dto';
+import { CreateAcademyYearDto } from '../../../../util/dto/create-request/create-academy-year.dto';
+import { UpdateAcademyYearDto } from '../../../../util/dto/update-request/update-academy-year.dto';
 
 @Controller()
 export class AcademyYearsController {

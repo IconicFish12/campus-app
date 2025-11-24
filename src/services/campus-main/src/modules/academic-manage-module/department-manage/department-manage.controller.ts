@@ -8,8 +8,8 @@ import {
   Delete,
 } from '@nestjs/common';
 import { DepartmentManageService } from './department-manage.service';
-import { CreateDepartmentManageDto } from './dto/create-department-manage.dto';
-import { UpdateDepartmentManageDto } from './dto/update-department-manage.dto';
+import { CreateDepartmentManageDto } from '../../../util/dto/create-request/create-department-manage.dto';
+import { UpdateDepartmentManageDto } from '../../../util/dto/update-request/update-department-manage.dto';
 
 @Controller()
 export class DepartmentManageController {

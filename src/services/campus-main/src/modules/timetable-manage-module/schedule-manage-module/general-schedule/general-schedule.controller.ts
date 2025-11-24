@@ -8,8 +8,8 @@ import {
   Delete,
 } from '@nestjs/common';
 import { GeneralScheduleService } from './general-schedule.service';
-import { CreateGeneralScheduleDto } from './dto/create-general-schedule.dto';
-import { UpdateGeneralScheduleDto } from './dto/update-general-schedule.dto';
+import { CreateGeneralScheduleDto } from '../../../../util/dto/create-request/create-general-schedule.dto';
+import { UpdateGeneralScheduleDto } from '../../../../util/dto/update-request/update-general-schedule.dto';
 
 @Controller()
 export class GeneralScheduleController {

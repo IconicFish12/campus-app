@@ -97,10 +97,11 @@ enum AttendanceStatus {
 
 model User {
   id             String      @id @default(uuid()) @db.Uuid
-  email          String      @unique @map("email")
   firstName      String      @map("first_name")
   lastName       String      @map("last_name")
   middleName     String?     @map("middle_name")
+  email          String      @unique @map("email")
+  password       String      @unique @map("password")
   gender         Gender
   status         Status      @default(ACTIVE)
   profilePicture String?     @map("profile_picture")
@@ -109,8 +110,8 @@ model User {
   updatedAt      DateTime    @updatedAt @map("updated_at") @db.Timestamp()
   lecturer       Lecturer?
   student        Student?
-  userRoles      UserRoles[]
   employee       Employee?
+  userRoles      UserRoles[]
   Address        Address?
 
   @@map("users")
@@ -195,7 +196,6 @@ model Departments {
   description String?    @map("description") @db.Text
   createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamp()
   updatedAt   DateTime   @updatedAt @map("updated_at") @db.Timestamp()
-  lecturers   Lecturer[]
   programs    Programs[]
 
   @@map("departments")
@@ -208,12 +208,13 @@ model Programs {
   level           ProgramLevel     @map("program_level")
   departmentId    String           @map("department_id") @db.Uuid
   department      Departments      @relation(fields: [departmentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  courses         Courses[]
   createdAt       DateTime         @default(now()) @map("created_at") @db.Timestamp()
   updatedAt       DateTime         @updatedAt @map("updated_at") @db.Timestamp()
   students        Student[]
   admissionQuotas AdmissionQuota[]
   classes         Class[]
+  lecturers       Lecturer[]
+  courses         Courses[]
 
   @@map("programs")
 }
@@ -240,8 +241,8 @@ model Lecturer {
   user              User                @relation(fields: [lecturerId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   nidn              String              @unique @map("nidn")
   academicRank      AcademicRank?       @map("academic_rank")
-  departmentId      String              @map("department_id") @db.Uuid
-  department        Departments?        @relation(fields: [departmentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  programId         String              @map("program_id") @db.Uuid
+  program           Programs            @relation(fields: [programId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   employmentStatus  EmploymentStatus    @map("employment_status")
   specializations   Json?
   hireDate          DateTime            @map("hire_date") @db.Date

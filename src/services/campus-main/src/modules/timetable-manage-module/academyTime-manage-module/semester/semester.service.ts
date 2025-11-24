@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateSemesterDto } from './dto/create-semester.dto';
-import { UpdateSemesterDto } from './dto/update-semester.dto';
+import { CreateSemesterDto } from '../../../../util/dto/create-request/create-semester.dto';
+import { UpdateSemesterDto } from '../../../../util/dto/update-request/update-semester.dto';
 
 @Injectable()
 export class SemesterService {
