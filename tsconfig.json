@@ -23,13 +23,13 @@
   //   // "lib": ["ES2021", "DOM"]
   // }
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "esnext",
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "es2021",
+    "target": "es2023",
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
@@ -42,5 +42,6 @@
     "noFallthroughCasesInSwitch": false,
     "moduleResolution": "node",
     "esModuleInterop": true,
+    "strict": true
   }
 }
