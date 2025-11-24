@@ -1,0 +1,491 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/lms-client"
+  generatedFileExtension = "mts"
+  importFileExtension = "mts"
+  moduleFormat = "esm"
+  runtime = "nodejs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum LmsUserRole {
+  STUDENT
+  LECTURER
+  ADMIN
+}
+
+enum SemesterNameLMS {
+  GANJIL
+  GENAP
+  PENDEK
+}
+
+enum LmsCourseStatus {
+  ACTIVE
+  ARCHIVED
+  DRAFT
+}
+
+enum LmsCompletionStatus {
+  IN_PROGRESS
+  COMPLETED
+  DROPPED
+}
+
+enum LmsModuleStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum LmsContentType {
+  TEXT
+  VIDEO
+  FILE
+  QUIZ
+  ASSIGNMENT
+}
+
+enum LmsQuestionType {
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+  SHORT_ANSWER
+  ESSAY
+}
+
+enum LmsQuizAttemptStatus {
+  IN_PROGRESS
+  COMPLETED
+  SUBMITTED
+}
+
+enum LmsAssignmentSubmissionType {
+  ONLINE_TEXT
+  FILE_UPLOAD
+  OFFLINE
+}
+
+enum LmsAssignmentSubmissionStatus {
+  SUBMITTED
+  GRADED
+  LATE
+}
+
+enum AssignmentType {
+  REGULAR_TASK
+  PROJECT
+  GROUP_ASSIGNMENT
+  ESSAY
+  PRESENTATION
+  FORMAL_EXAM
+  SPECIAL_TASK
+}
+
+enum QuizType {
+  QUIZ
+  MIDTERM_EXAM
+  FINAL_EXAM
+  PRACTICE_TEST
+  POLL
+  SURVEY
+}
+
+// --- MODEL DEFINITIONS ---
+
+// 1. lms_courses Table (Mata Kuliah di LMS)
+// Catatan: Ini adalah representasi mata kuliah yang sebenarnya ada di LMS.
+// Data dasarnya HARUS disinkronkan dari Campus Management (melalui EDA).
+model Course {
+  id             String          @id @default(uuid()) @map("id") @db.Uuid
+  campusCourseId String          @map("campus_course_id") @db.Uuid // Kunci penting untuk sinkronisasi dengan Campus Management!
+  name           String          @map("course_name")
+  code           String          @unique @map("course_code")
+  description    String?
+  lecturerId     String          @map("lecturer_id") @db.Uuid // FK ke LmsUser (Lecturer role)
+  lecturer       LmsUser         @relation("CourseLecturer", fields: [lecturerId], references: [id])
+  academicYearId String          @map("academic_year_id") @db.Uuid // FK ke AcademicYear
+  academicYear   AcademicYear    @relation(fields: [academicYearId], references: [id])
+  semesterId     String          @map("semester_id") @db.Uuid // FK ke Semester
+  semester       Semester        @relation(fields: [semesterId], references: [id])
+  enrollmentKey  String?         @map("enrollment_key") // Untuk pendaftaran mandiri jika diperlukan
+  status         LmsCourseStatus @default(DRAFT)
+  startDate      DateTime        @map("start_date") @db.Date
+  endDate        DateTime        @map("end_date") @db.Date
+
+  // Relasi balik
+  courseEnrollments CourseEnrollment[] // Pendaftaran mahasiswa ke kursus ini
+  modules           Module[] // Modul pembelajaran di kursus ini
+  quizzes           Quiz[] // Kuis di kursus ini (jika tidak terkait lesson)
+  assignments       Assignment[] // Tugas di kursus ini
+  forums            Forum[] // Forum diskusi di kursus ini
+  announcements     Announcement[] // Pengumuman di kursus ini
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("courses")
+}
+
+// 2. lms_users Table (Pengguna LMS)
+// Catatan: Ini adalah subset data dari User di Campus Management.
+// ID harus sama persis dengan User ID dari Campus Management.
+model LmsUser {
+  id                String      @id @map("id") @db.Uuid // PK, harus sama dengan User.id di Campus DB
+  email             String      @unique @map("email")
+  firstName         String      @map("first_name")
+  lastName          String      @map("last_name")
+  profilePictureUrl String?     @map("profile_picture_url")
+  role              LmsUserRole // Contoh: STUDENT, LECTURER, ADMIN
+  lastLoginAt       DateTime?   @map("last_login_at")
+
+  // Relasi balik
+  lecturedCourses     Course[]             @relation("CourseLecturer") // Kursus yang diajar oleh dosen ini
+  courseEnrollments   CourseEnrollment[] // Pendaftaran kursus mahasiswa
+  studentQuizAttempts StudentQuizAttempt[] // Percobaan kuis mahasiswa
+  forumPosts          ForumPost[] // Postingan forum
+  attachments         Attachment[] // Lampiran yang diunggah
+  announcements       Announcement[] // Pengumuman yang dibuat
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Pengguna LMS pengumpul dan penilai  
+  submitedBy StudentSubmission[] @relation("StudentSubmissionStudent")
+  gradedBy   StudentSubmission[] @relation("SubmissionGrader")
+
+  @@map("lms_users")
+}
+
+// 3. lms_academic_years Table (Tahun Akademik LMS)
+// Catatan: Sinkronisasi dari Campus Management.
+// ID harus sama persis dengan AcademicYear.id dari Campus Management.
+model AcademicYear {
+  id        String   @id @map("id") @db.Uuid // PK, harus sama dengan AcademicYear.id di Campus DB
+  year      String   @unique
+  startDate DateTime @map("start_date") @db.Date
+  endDate   DateTime @map("end_date") @db.Date
+  isCurrent Boolean  @default(false) @map("is_current")
+
+  // Relasi balik
+  courses  Course[] // Kursus yang terkait dengan tahun akademik ini
+  Semester Semester[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("academic_years")
+}
+
+// 4. lms_semesters Table (Semester LMS)
+// Catatan: Sinkronisasi dari Campus Management.
+// ID harus sama persis dengan Semester.id dari Campus Management.
+model Semester {
+  id             String          @id @map("id") @db.Uuid // PK, harus sama dengan Semester.id di Campus DB
+  academicYearId String          @map("academic_year_id") @db.Uuid // FK ke AcademicYear di LMS DB
+  academicYear   AcademicYear    @relation(fields: [academicYearId], references: [id])
+  name           SemesterNameLMS // Enum: GANJIL, GENAP, PENDEK
+  startDate      DateTime        @map("start_date") @db.Date
+  endDate        DateTime        @map("end_date") @db.Date
+
+  // Relasi balik
+  courses Course[] // Kursus yang terkait dengan semester ini
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("semesters")
+}
+
+// 5. course_enrollments Table (Pendaftaran Mahasiswa ke Kursus LMS)
+// Catatan: Ini adalah pendaftaran siswa ke kursus yang ada di LMS.
+// Data `studentId` dan `courseId` adalah dari tabel di LMS DB.
+model CourseEnrollment {
+  studentId        String              @map("student_id") @db.Uuid // FK ke LmsUser
+  student          LmsUser             @relation(fields: [studentId], references: [id])
+  courseId         String              @map("course_id") @db.Uuid // FK ke Course di LMS DB
+  course           Course              @relation(fields: [courseId], references: [id])
+  enrollmentDate   DateTime            @default(now()) @map("enrollment_date")
+  completionStatus LmsCompletionStatus @default(IN_PROGRESS) @map("completion_status")
+  grade            Float? // Nilai akhir di LMS
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@id([studentId, courseId]) // Primary Key Gabungan
+  @@map("course_enrollments")
+}
+
+// 6. modules Table (Modul Pembelajaran)
+model Module {
+  id          String          @id @default(uuid()) @map("id") @db.Uuid
+  courseId    String          @map("course_id") @db.Uuid // FK ke Course di LMS DB
+  course      Course          @relation(fields: [courseId], references: [id])
+  title       String
+  description String?
+  orderIndex  Int             @map("order_index")
+  status      LmsModuleStatus @default(DRAFT)
+
+  // Relasi balik
+  lessons Lesson[] // Pelajaran dalam modul ini
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("modules")
+}
+
+// 7. lessons Table (Pelajaran/Unit Konten)
+model Lesson {
+  id              String         @id @default(uuid()) @map("id") @db.Uuid
+  moduleId        String         @map("module_id") @db.Uuid // FK ke Module
+  module          Module         @relation(fields: [moduleId], references: [id])
+  title           String
+  contentType     LmsContentType @map("content_type") // Enum: TEXT, VIDEO, FILE, QUIZ, ASSIGNMENT
+  contentUrl      String?        @map("content_url") // URL ke file/video
+  contentText     String?        @map("content_text") @db.Text // Konten teks langsung
+  durationMinutes Int?           @map("duration_minutes")
+  orderIndex      Int            @map("order_index")
+  isPublished     Boolean        @default(false) @map("is_published")
+
+  // Relasi balik
+  attachments Attachment[] // Lampiran yang terkait dengan pelajaran ini
+  quizzes     Quiz[] // Kuis yang terkait dengan pelajaran ini
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("lessons")
+}
+
+// 8. attachments Table (Lampiran)
+model Attachment {
+  id           String  @id @default(uuid()) @map("id") @db.Uuid
+  lessonId     String? @map("lesson_id") @db.Uuid // FK ke Lesson (Opsional)
+  lesson       Lesson? @relation(fields: [lessonId], references: [id])
+  // resourceId   String?  // Untuk relasi polimorfik jika diperlukan, bisa diimplementasikan secara manual
+  fileName     String  @map("file_name")
+  fileUrl      String  @map("file_url")
+  fileType     String  @map("file_type")
+  fileSize     Int?    @map("file_size")
+  uploadedById String  @map("uploaded_by_id") @db.Uuid // FK ke LmsUser
+  uploadedBy   LmsUser @relation(fields: [uploadedById], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("attachments")
+}
+
+// 9. quizzes Table (Kuis/Ujian)
+model Quiz {
+  id                     String    @id @default(uuid()) @map("id") @db.Uuid
+  lessonId               String?   @map("lesson_id") @db.Uuid // FK ke Lesson (Opsional)
+  lesson                 Lesson?   @relation(fields: [lessonId], references: [id])
+  courseId               String    @map("course_id") @db.Uuid // FK ke Course (Wajib jika kuis independen dari lesson)
+  course                 Course    @relation(fields: [courseId], references: [id])
+  title                  String
+  description            String?
+  totalPoints            Float     @map("total_points")
+  type                   QuizType  @default(QUIZ) @map("quiz_type")
+  dueDate                DateTime? @map("due_date") @db.Timestamp(3) // Menggunakan Timestamp untuk tanggal dan waktu
+  timeLimitMinutes       Int?      @map("time_limit_minutes")
+  maxAttempts            Int       @default(1) @map("max_attempts")
+  showResultsImmediately Boolean   @default(false) @map("show_results_immediately")
+  isPublished            Boolean   @default(false) @map("is_published")
+
+  // Relasi balik
+  questions           Question[] // Pertanyaan dalam kuis ini
+  studentQuizAttempts StudentQuizAttempt[] // Percobaan kuis mahasiswa
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("quizzes")
+}
+
+// 10. questions Table (Pertanyaan Kuis)
+model Question {
+  id           String          @id @default(uuid()) @map("id") @db.Uuid
+  quizId       String          @map("quiz_id") @db.Uuid // FK ke Quiz
+  quiz         Quiz            @relation(fields: [quizId], references: [id])
+  questionText String          @map("question_text") @db.Text // Menggunakan @db.Text untuk teks panjang
+  questionType LmsQuestionType @map("question_type") // Enum: MULTIPLE_CHOICE, TRUE_FALSE, SHORT_ANSWER, ESSAY
+  points       Float
+  orderIndex   Int             @map("order_index")
+
+  // Relasi balik
+  options        Option[] // Opsi jawaban (untuk MC)
+  studentAnswers StudentAnswer[] // Jawaban mahasiswa
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("questions")
+}
+
+// 11. options Table (Opsi Jawaban untuk Multiple Choice)
+model Option {
+  id         String   @id @default(uuid()) @map("id") @db.Uuid
+  questionId String   @map("question_id") @db.Uuid // FK ke Question
+  question   Question @relation(fields: [questionId], references: [id])
+  optionText String   @map("option_text")
+  isCorrect  Boolean  @default(false) @map("is_correct")
+
+  // Relasi balik
+  studentAnswers StudentAnswer[] // Jawaban mahasiswa yang memilih opsi ini
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("options")
+}
+
+// 12. student_quiz_attempts Table (Percobaan Kuis Mahasiswa)
+model StudentQuizAttempt {
+  id            String               @id @default(uuid()) @map("id") @db.Uuid
+  studentId     String               @map("student_id") @db.Uuid // FK ke LmsUser (Student role)
+  student       LmsUser              @relation(fields: [studentId], references: [id])
+  quizId        String               @map("quiz_id") @db.Uuid // FK ke Quiz
+  quiz          Quiz                 @relation(fields: [quizId], references: [id])
+  attemptNumber Int                  @map("attempt_number")
+  startTime     DateTime             @map("start_time") @db.Timestamp(3)
+  endTime       DateTime?            @map("end_time") @db.Timestamp(3)
+  score         Float?
+  status        LmsQuizAttemptStatus @default(IN_PROGRESS)
+
+  // Relasi balik
+  studentAnswers StudentAnswer[] // Jawaban spesifik untuk percobaan ini
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("student_quiz_attempts")
+}
+
+// 13. student_answers Table (Jawaban Mahasiswa)
+model StudentAnswer {
+  id               String             @id @default(uuid()) @map("id") @db.Uuid
+  attemptId        String             @map("attempt_id") @db.Uuid // FK ke StudentQuizAttempt
+  attempt          StudentQuizAttempt @relation(fields: [attemptId], references: [id])
+  questionId       String             @map("question_id") @db.Uuid // FK ke Question
+  question         Question           @relation(fields: [questionId], references: [id])
+  selectedOptionId String?            @map("selected_option_id") @db.Uuid // FK ke Option (Opsional, untuk MC)
+  selectedOption   Option?            @relation(fields: [selectedOptionId], references: [id])
+  answerText       String?            @map("answer_text") @db.Text // Untuk Short Answer/Essay
+  isCorrect        Boolean?           @map("is_correct") // Opsional, bisa dihitung dari selectedOption.isCorrect atau penilaian manual
+  scoreAchieved    Float?             @map("score_achieved") // Untuk essay yang dinilai manual
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("student_answers")
+}
+
+// 14. assignments Table (Tugas)
+model Assignment {
+  id               String                      @id @default(uuid()) @map("id") @db.Uuid
+  courseId         String                      @map("course_id") @db.Uuid // FK ke Course
+  course           Course                      @relation(fields: [courseId], references: [id])
+  title            String
+  description      String?                     @db.Text
+  totalPoints      Float                       @map("total_points")
+  dueDate          DateTime                    @map("due_date") @db.Timestamp(3)
+  submissionType   LmsAssignmentSubmissionType @map("submission_type")
+  maxFileSizeMb    Int?                        @map("max_file_size_mb")
+  allowedFileTypes Json?                       @map("allowed_file_types")
+  isPublished      Boolean                     @default(false) @map("is_published")
+  type             AssignmentType              @default(REGULAR_TASK) @map("assignment_type")
+
+  // Relasi balik
+  studentSubmissions StudentSubmission[] // Pengumpulan tugas mahasiswa
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("assignments")
+}
+
+// 15. student_submissions Table (Pengumpulan Tugas Mahasiswa)
+model StudentSubmission {
+  id             String                        @id @default(uuid()) @map("id") @db.Uuid
+  assignmentId   String                        @map("assignment_id") @db.Uuid // FK ke Assignment
+  assignment     Assignment                    @relation(fields: [assignmentId], references: [id])
+  studentId      String                        @map("student_id") @db.Uuid // FK ke LmsUser (Student role)
+  student        LmsUser                       @relation("StudentSubmissionStudent", fields: [studentId], references: [id])
+  submissionText String?                       @map("submission_text") @db.Text
+  fileUrl        String?                       @map("file_url")
+  submittedAt    DateTime                      @map("submitted_at") @db.Timestamp(3)
+  status         LmsAssignmentSubmissionStatus @default(SUBMITTED)
+  gradeScore     Float?                        @map("grade_score")
+  feedback       String?                       @db.Text
+  gradedById     String?                       @map("graded_by_id") @db.Uuid // FK ke LmsUser (Lecturer role)
+  gradedBy       LmsUser?                      @relation("SubmissionGrader", fields: [gradedById], references: [id])
+  gradedAt       DateTime?                     @map("graded_at") @db.Timestamp(3)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("student_submissions")
+}
+
+// 16. forums Table (Forum Diskusi)
+model Forum {
+  id          String  @id @default(uuid()) @map("id") @db.Uuid
+  courseId    String  @map("course_id") @db.Uuid // FK ke Course
+  course      Course  @relation(fields: [courseId], references: [id])
+  title       String
+  description String? @db.Text
+  isOpen      Boolean @default(true) @map("is_open")
+
+  // Relasi balik
+  forumPosts ForumPost[] // Postingan dalam forum ini
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("forums")
+}
+
+// 17. forum_posts Table (Postingan Forum)
+model ForumPost {
+  id           String      @id @default(uuid()) @map("id") @db.Uuid
+  forumId      String      @map("forum_id") @db.Uuid // FK ke Forum
+  forum        Forum       @relation(fields: [forumId], references: [id])
+  authorId     String      @map("author_id") @db.Uuid // FK ke LmsUser
+  author       LmsUser     @relation(fields: [authorId], references: [id])
+  parentPostId String?     @map("parent_post_id") @db.Uuid // FK ke ForumPost (untuk balasan)
+  parentPost   ForumPost?  @relation("ParentChildPosts", fields: [parentPostId], references: [id])
+  childPosts   ForumPost[] @relation("ParentChildPosts") // Relasi balik untuk balasan
+
+  content   String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("forum_posts")
+}
+
+// 18. announcements Table (Pengumuman)
+model Announcement {
+  id          String    @id @default(uuid()) @map("id") @db.Uuid
+  courseId    String    @map("course_id") @db.Uuid // FK ke Course
+  course      Course    @relation(fields: [courseId], references: [id])
+  title       String
+  content     String    @db.Text
+  authorId    String    @map("author_id") @db.Uuid // FK ke LmsUser
+  author      LmsUser   @relation(fields: [authorId], references: [id])
+  publishedAt DateTime  @map("published_at") @db.Timestamp(3)
+  expiresAt   DateTime? @map("expires_at") @db.Timestamp(3)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("announcements")
+}
