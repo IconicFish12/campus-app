@@ -1,13 +1,22 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
+import 'dotenv/config';
 import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
   ValidationArguments,
 } from 'class-validator';
 import { Injectable, Scope } from '@nestjs/common';
+<<<<<<< HEAD:src/common/pipes/validators/constraint/is-unique-constraint.ts
 import { CampusPrismaModelName } from '../models/campus-prisma-models';
 import { PrismaClient as GeneratedPrismaClient } from 'src/common/Database/campus-db/generated/campus-client';
+=======
+import { CampusPrismaModelName } from './models/campus-prisma-models';
+import { PrismaClient as GeneratedPrismaClient } from '../../Database/campus-db/generated/campus-client/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { env } from 'prisma/config';
+>>>>>>> main:src/common/pipes/validators/is-unique-constraint.ts
 
 @ValidatorConstraint({ name: 'isUnique', async: true })
 @Injectable({ scope: Scope.REQUEST }) // Tetap di REQUEST scope
@@ -15,7 +24,10 @@ export class IsUniqueConstraint implements ValidatorConstraintInterface {
   private prismaClient: GeneratedPrismaClient;
 
   constructor() {
-    this.prismaClient = new GeneratedPrismaClient();
+    const adapter = new PrismaPg({
+      connectionString: env('CAMPUS_DATABASE_URL'),
+    });
+    this.prismaClient = new GeneratedPrismaClient({ adapter: adapter });
   }
 
   async validate(value: any, args: ValidationArguments): Promise<boolean> {

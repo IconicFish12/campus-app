@@ -1,17 +1,21 @@
-// This is your Prisma Campus schema file,
-// You can change the attributes or tables according to your needs. 
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
   output   = "../generated/campus-client"
+  generatedFileExtension = "ts"
+  moduleFormat = "esm"
+  importFileExtension = "ts"
+  runtime = "nodejs"
 }
-
 datasource db {
   provider = "postgresql"
-  url      = env("CAMPUS_DATABASE_URL")
 }
 
-// Enum DataType
 enum Gender {
   MALE
   FEMALE
