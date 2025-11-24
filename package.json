@@ -7,12 +7,6 @@
   "license": "UNLICENSED",
   "type": "module",
   "scripts": {
-    "prisma:campus:migrate": "npx prisma migrate dev --schema=./src/common/Database/campus-db/prisma/schema.prisma",
-    "prisma:campus:generate": "npx prisma generate --schema=./src/common/Database/campus-db/prisma/schema.prisma",
-    "prisma:campus:studio": "npx prisma studio --schema=./src/common/Database/campus-db/prisma/schema.prisma",
-    "prisma:lms:migrate": "npx prisma migrate dev --schema=./src/common/Database/lms-db/prisma/schema.prisma",
-    "prisma:lms:generate": "npx prisma generate --schema=./src/common/Database/lms-db/prisma/schema.prisma",
-    "prisma:lms:studio": "npx prisma studio --schema=./src/common/Database/lms-db/prisma/schema.prisma",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",

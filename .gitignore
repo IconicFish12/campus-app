@@ -51,9 +51,8 @@ lerna-debug.log*
 .env.local
 
 # prismaORM
-/src/common/Database/campus-db/generated/campus-client
-/src/common/Database/lms-db/generated/lms-client
-
+/src/services/campus-main/src/database/generated/campus-client
+/src/services/campus-main/src/database/generated/lms-client
 
 # temp directory
 .temp
