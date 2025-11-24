@@ -17,6 +17,7 @@ export default tseslint.config(
         ...globals.node,
         ...globals.jest,
       },
+      ecmaVersion: 5,
       sourceType: 'module',
       parserOptions: {
         projectService: true,
@@ -28,7 +29,7 @@ export default tseslint.config(
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-floating-promises': 'warn',
-      '@typescript-eslint/no-unsafe-argument': 'warn'
+      '@typescript-eslint/no-unsafe-argument': 'warn',
     },
   },
 );

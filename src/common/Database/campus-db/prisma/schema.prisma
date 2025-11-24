@@ -1,17 +1,20 @@
-// This is your Prisma Campus schema file,
-// You can change the attributes or tables according to your needs. 
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
   output   = "../generated/campus-client"
+  generatedFileExtension = "ts"
+  moduleFormat = "esm"
+  importFileExtension = "ts"
+  runtime = "nodejs"
 }
-
 datasource db {
   provider = "postgresql"
-  url      = env("CAMPUS_DATABASE_URL")
 }
-
-// Enum DataType
 
 enum Gender {
   MALE
@@ -22,16 +25,10 @@ enum Gender {
 enum Status {
   ACTIVE
   INACTIVE
-  SUSPANDED
+  SUSPENDED
 }
 
-enum Offer {
-  ODD
-  EVEN
-  SHORT
-}
-
-enum SemesterName {
+enum SemesterStatus {
   ODD
   EVEN
   SHORT
@@ -48,7 +45,7 @@ enum StudentStatus {
 enum EmploymentStatus {
   FULL_TIME
   PART_TIME
-  VISSTING
+  VISITING
 }
 
 enum AcademicRank {
@@ -79,99 +76,114 @@ enum ClassScheduleStatus {
   ACTIVE
   DELAY
   CANCELLED
-  PENUH
+  FULL
 }
 
-enum StudentEnrollmentStatus {
+enum EnrollmentStatus {
   ENROLLED
   DROPPED
   COMPLETED
+  NOT_ENROLLED
+  REGISTERED // Dari ClassEnrollmentStatus, disatukan
 }
 
-// Model
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  SICK
+  PERMITTED
+  LATE
+}
 
 model User {
-  id              String      @id @default(uuid()) @db.Uuid
-  email           String      @unique @map("email")
-  firstName       String      @map("firt_name")
-  lastName        String      @map("last_name")
-  middleName      String?     @map("middle_name")
-  gender          Gender
-  addressId       String?     @unique @map("addressId") @db.Uuid
-  address         Address?    @relation(fields: [addressId], references: [id])
-  status          Status      @default(ACTIVE)
-  profile_picture String?     @map("profile_picture")
-  isVerified      Boolean     @default(false) @map("is_verified")
-  created_at      DateTime    @default(now()) @map("created_at")
-  updated_at      DateTime    @updatedAt @map("updated_at")
-  lecturers       Lecturers?
-  Student         Student?
-  User_roles      UserRoles[]
+  id             String      @id @default(uuid()) @db.Uuid
+  firstName      String      @map("first_name")
+  lastName       String      @map("last_name")
+  middleName     String?     @map("middle_name")
+  email          String      @unique @map("email")
+  password       String      @unique @map("password")
+  gender         Gender
+  status         Status      @default(ACTIVE)
+  profilePicture String?     @map("profile_picture")
+  isVerified     Boolean     @default(false) @map("is_verified")
+  createdAt      DateTime    @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt      DateTime    @updatedAt @map("updated_at") @db.Timestamp()
+  lecturer       Lecturer?
+  student        Student?
+  employee       Employee?
+  userRoles      UserRoles[]
+  Address        Address?
 
   @@map("users")
 }
 
 model Address {
-  id          String   @id @default(uuid()) @db.Uuid
-  User        User?
-  fullAddress String   @map("full_address")
-  countryId   String?  @unique @map("country_id") @db.Uuid
-  country     Country? @relation(fields: [countryId], references: [id])
-  postalCode  Int?     @map("postal_code")
+  id          String  @id @default(uuid()) @db.Uuid
+  userId      String? @unique @map("user_id") @db.Uuid
+  user        User?   @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  fullAddress String  @map("full_address")
+  cityId      String  @map("city_id") @db.Uuid
+  city        City    @relation(fields: [cityId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  postalCode  Int?    @map("postal_code")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp()
 
   @@map("addresses")
 }
 
 model City {
-  id         String   @id @default(uuid()) @db.Uuid
-  stateId    String   @map("state_id") @db.Uuid
-  state      State    @relation(fields: [stateId], references: [id])
-  name       String   @map("city_name")
-  created_at DateTime @default(now()) @map("created_at")
-  updated_at DateTime @updatedAt @map("updated_at")
+  id        String    @id @default(uuid()) @db.Uuid
+  stateId   String    @map("state_id") @db.Uuid
+  state     State     @relation(fields: [stateId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  name      String    @map("city_name")
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamp()
+  addresses Address[]
 
   @@map("cities")
 }
 
 model State {
-  id         String   @id @default(uuid()) @db.Uuid
-  countryId  String   @map("country_id") @db.Uuid
-  country    Country  @relation(fields: [countryId], references: [id])
-  name       String   @map("state_name")
-  created_at DateTime @default(now()) @map("created_at")
-  updated_at DateTime @updatedAt @map("updated_at")
-  City       City[]
+  id        String   @id @default(uuid()) @db.Uuid
+  countryId String   @map("country_id") @db.Uuid
+  country   Country  @relation(fields: [countryId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  name      String   @map("state_name")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp()
+  cities    City[]
 
   @@map("states")
 }
 
 model Country {
-  id         String   @id @default(uuid()) @db.Uuid
-  name       String   @map("country_name")
-  created_at DateTime @default(now()) @map("created_at")
-  updated_at DateTime @updatedAt @map("updated_at")
-  State      State[]
-  Address    Address?
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @map("country_name")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp()
+  states    State[]
 
   @@map("countries")
 }
 
 model Roles {
   id          String      @id @default(uuid()) @db.Uuid
-  name        String      @map("roles_name")
-  description String?     @map("description")
-  created_at  DateTime    @default(now()) @map("created_at")
-  updated_at  DateTime    @updatedAt @map("updated_at")
+  name        String      @unique @map("role_name")
+  description String?     @map("description") @db.Text
+  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt   DateTime    @updatedAt @map("updated_at") @db.Timestamp()
   userRoles   UserRoles[]
 
   @@map("roles")
 }
 
 model UserRoles {
-  userId String @default(uuid()) @db.Uuid
-  roleId String @default(uuid()) @db.Uuid
-  user   User   @relation(fields: [userId], references: [id])
-  role   Roles  @relation(fields: [roleId], references: [id])
+  userId    String   @map("user_id") @db.Uuid
+  roleId    String   @map("role_id") @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  role      Roles    @relation(fields: [roleId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp()
 
   @@id([userId, roleId])
   @@map("user_roles")
@@ -179,128 +191,130 @@ model UserRoles {
 
 model Departments {
   id          String     @id @default(uuid()) @db.Uuid
-  name        String     @unique @map("departement_name")
-  code        String     @unique @map("departement_code")
-  description String?    @map("description")
-  program     Programs[]
-  created_at  DateTime   @default(now()) @map("created_at")
-  updated_at  DateTime   @updatedAt @map("updated_at")
-  Lecturers   Lecturers?
+  name        String     @unique @map("department_name")
+  code        String     @unique @map("department_code")
+  description String?    @map("description") @db.Text
+  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt   DateTime   @updatedAt @map("updated_at") @db.Timestamp()
+  programs    Programs[]
 
   @@map("departments")
 }
 
 model Programs {
-  id           String       @id @default(uuid()) @db.Uuid
-  name         String       @unique @map("program_name")
-  code         String       @unique @map("program_code")
-  level        ProgramLevel @map("program_level")
-  departmentId String       @db.Uuid
-  department   Departments  @relation(fields: [departmentId], references: [id])
-  courses      Courses[]
-  created_at   DateTime     @default(now()) @map("created_at")
-  updated_at   DateTime     @updatedAt @map("updated_at")
-  Student      Student?
+  id              String           @id @default(uuid()) @db.Uuid
+  name            String           @unique @map("program_name")
+  code            String           @unique @map("program_code")
+  level           ProgramLevel     @map("program_level")
+  departmentId    String           @map("department_id") @db.Uuid
+  department      Departments      @relation(fields: [departmentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  createdAt       DateTime         @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt       DateTime         @updatedAt @map("updated_at") @db.Timestamp()
+  students        Student[]
+  admissionQuotas AdmissionQuota[]
+  classes         Class[]
+  lecturers       Lecturer[]
+  courses         Courses[]
 
-  @@map("progams")
+  @@map("programs")
 }
 
 model Courses {
-  id               String          @id @default(uuid()) @db.Uuid
-  name             String          @unique @map("course_name")
-  code             String          @unique @map("course_code")
-  credits          Float           @map("course_credit")
-  programId        String          @map("program_id") @db.Uuid
-  program          Programs        @relation(fields: [programId], references: [id])
-  prerequisites    Json            @map("prerequisites")
-  semester_offered Offer?          @map("semester_offered")
-  created_at       DateTime        @default(now()) @map("created_at")
-  updated_at       DateTime        @updatedAt @map("updated_at")
-  ClassSchedule    ClassSchedule[]
+  id                String             @id @default(uuid()) @db.Uuid
+  name              String             @unique @map("course_name")
+  code              String             @unique @map("course_code")
+  credits           Float              @map("course_credit")
+  programId         String             @map("program_id") @db.Uuid
+  program           Programs           @relation(fields: [programId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  prerequisites     Json               @map("prerequisites")
+  semesterOffered   SemesterStatus?    @map("semester_offered")
+  createdAt         DateTime           @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt         DateTime           @updatedAt @map("updated_at") @db.Timestamp()
+  classSchedules    ClassSchedule[]
+  courseEnrollments CourseEnrollment[]
 
   @@map("courses")
 }
 
-model Lecturers {
-  userId           String           @id @map("user_id") @db.Uuid
-  user             User             @relation(fields: [userId], references: [id])
-  nidn             String?
-  academicRank     AcademicRank?    @map("academic_rank")
-  departmentId     String           @unique @map("department_id") @db.Uuid
-  departement      Departments?     @relation(fields: [departmentId], references: [id])
-  employmentStatus EmploymentStatus @map("employment_status")
-  specializations  Json?
-  hireDate         DateTime         @map("hire_date")
-  createdAt        DateTime         @default(now()) @map("created_at")
-  updatedAt        DateTime         @updatedAt @map("updated_at")
-  ClassSchedule    ClassSchedule[]
+model Lecturer {
+  lecturerId        String              @id @map("lecturer_id") @db.Uuid
+  user              User                @relation(fields: [lecturerId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  nidn              String              @unique @map("nidn")
+  academicRank      AcademicRank?       @map("academic_rank")
+  programId         String              @map("program_id") @db.Uuid
+  program           Programs            @relation(fields: [programId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  employmentStatus  EmploymentStatus    @map("employment_status")
+  specializations   Json?
+  hireDate          DateTime            @map("hire_date") @db.Date
+  createdAt         DateTime            @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt         DateTime            @updatedAt @map("updated_at") @db.Timestamp()
+  classSchedules    ClassSchedule[]
+  lecturerSchedules LecturersSchedule[]
 
   @@map("lecturers")
 }
 
 model Student {
-  userId            String              @id @map("user_id") @db.Uuid
-  user              User                @relation(fields: [userId], references: [id])
-  nim               String              @unique
-  programId         String              @unique @map("program_id") @db.Uuid
-  program           Programs?           @relation(fields: [programId], references: [id])
-  enrollmentYear    Int                 @map("enrollment_year")
-  currentSemester   Int                 @map("current_semester")
-  academicStatus    StudentStatus       @default(ACTIVE) @map("academic_status")
-  gpa               Float?
-  admissionType     String?             @map("admission_type")
-  createdAt         DateTime            @default(now()) @map("created_at")
-  updatedAt         DateTime            @updatedAt @map("updated_at")
-  StudentEnrollment StudentEnrollment[]
+  studentId          String              @id @map("student_id") @db.Uuid
+  user               User                @relation(fields: [studentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  nim                String              @unique
+  programId          String              @map("program_id") @db.Uuid
+  program            Programs?           @relation(fields: [programId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  enrollmentYear     Int                 @map("enrollment_year")
+  currentSemester    Int                 @map("current_semester")
+  academicStatus     StudentStatus       @default(ACTIVE) @map("academic_status")
+  gpa                Float?
+  admissionType      String?             @map("admission_type")
+  createdAt          DateTime            @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt          DateTime            @updatedAt @map("updated_at") @db.Timestamp()
+  studentEnrollments StudentEnrollment[]
+  attendances        Attendance[]
+  courseEnrollments  CourseEnrollment[]
+  classEnrollments   ClassEnrollment[]
 
   @@map("students")
 }
 
-// 9. AcademicYear Table (Tahun Akademik)
 model AcademicYear {
-  id        String   @id @default(uuid()) @map("id") @db.Uuid
-  year      String   @unique
-  startDate DateTime @map("start_date") @db.Date
-  endDate   DateTime @map("end_date") @db.Date
-  isCurrent Boolean  @default(false) @map("is_current")
-
-  semesters Semester[] // Relasi ke Semester
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id              String           @id @default(uuid()) @map("id") @db.Uuid
+  year            String           @unique
+  startDate       DateTime         @map("start_date") @db.Date
+  endDate         DateTime         @map("end_date") @db.Date
+  isCurrent       Boolean          @default(false) @map("is_current")
+  semesters       Semester[]
+  admissionQuotas AdmissionQuota[] // AdmissionQuota -> admissionQuotas (plural)
+  createdAt       DateTime         @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt       DateTime         @updatedAt @map("updated_at") @db.Timestamp()
 
   @@map("academic_years")
 }
 
-// 10. Semester Table (Semester)
 model Semester {
-  id                       String       @id @default(uuid()) @map("id") @db.Uuid
-  academicYearId           String       @map("academic_year_id") @db.Uuid
-  academicYear             AcademicYear @relation(fields: [academicYearId], references: [id])
-  name                     SemesterName
-  startDate                DateTime     @map("start_date") @db.Date
-  endDate                  DateTime     @map("end_date") @db.Date
-  registrationStartDate    DateTime?    @map("registration_start_date") @db.Date
-  registrationEndDate      DateTime?    @map("registration_end_date") @db.Date
-  gradesSubmissionDeadline DateTime?    @map("grades_submission_deadline") @db.Date
-
-  classSchedules ClassSchedule[]
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id                       String             @id @default(uuid()) @map("id") @db.Uuid
+  academicYearId           String             @map("academic_year_id") @db.Uuid
+  academicYear             AcademicYear       @relation(fields: [academicYearId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  name                     SemesterStatus
+  startDate                DateTime           @map("start_date") @db.Date
+  endDate                  DateTime           @map("end_date") @db.Date
+  registrationStartDate    DateTime?          @map("registration_start_date") @db.Date
+  registrationEndDate      DateTime?          @map("registration_end_date") @db.Date
+  gradesSubmissionDeadline DateTime?          @map("grades_submission_deadline") @db.Date
+  classSchedules           ClassSchedule[]
+  createdAt                DateTime           @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt                DateTime           @updatedAt @map("updated_at") @db.Timestamp()
+  courseEnrollments        CourseEnrollment[]
 
   @@map("semesters")
 }
 
-// 11. ClassSchedule Table (Jadwal Kelas)
 model ClassSchedule {
   id                    String              @id @default(uuid()) @map("id") @db.Uuid
-  courseId              String              @map("course_id") @db.Uuid // FK ke Course
-  course                Courses             @relation(fields: [courseId], references: [id])
-  semesterId            String              @map("semester_id") @db.Uuid // FK ke Semester
-  semester              Semester            @relation(fields: [semesterId], references: [id])
-  lecturerId            String              @map("lecturer_id") @db.Uuid // FK ke Lecturer.userId
-  lecturer              Lecturers           @relation(fields: [lecturerId], references: [userId])
+  courseId              String              @map("course_id") @db.Uuid
+  course                Courses             @relation(fields: [courseId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  semesterId            String              @map("semester_id") @db.Uuid
+  semester              Semester            @relation(fields: [semesterId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  lecturerId            String              @map("lecturer_id") @db.Uuid
+  lecturer              Lecturer            @relation(fields: [lecturerId], references: [lecturerId]) // references: [lecturerId] dari Lecturer
   classCode             String              @unique @map("class_code")
   roomNumber            String?             @map("room_number")
   dayOfWeek             DayOfWeek           @map("day_of_week")
@@ -309,29 +323,155 @@ model ClassSchedule {
   capacity              Int
   enrolledStudentsCount Int                 @default(0) @map("enrolled_students_count")
   status                ClassScheduleStatus @default(ACTIVE)
-
-  studentEnrollments StudentEnrollment[]
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  studentEnrollments    StudentEnrollment[]
+  attendances           Attendance[]
+  createdAt             DateTime            @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt             DateTime            @updatedAt @map("updated_at") @db.Timestamp()
+  lecturerSchedules     LecturersSchedule[]
+  classEnrollments      ClassEnrollment[]
 
   @@map("class_schedules")
 }
 
-// 12. StudentEnrollment Table (Pendaftaran Mahasiswa ke Kelas)
 model StudentEnrollment {
-  studentId        String                  @map("student_id") @db.Uuid
-  student          Student                 @relation(fields: [studentId], references: [userId])
-  classScheduleId  String                  @map("class_schedule_id") @db.Uuid
-  classSchedule    ClassSchedule           @relation(fields: [classScheduleId], references: [id])
-  enrollmentDate   DateTime                @default(now()) @map("enrollment_date")
-  status           StudentEnrollmentStatus @default(ENROLLED)
-  finalGradeLetter String?                 @map("final_grade_letter")
-  finalGradeScore  Float?                  @map("final_grade_score")
+  studentId        String           @map("student_id") @db.Uuid
+  student          Student          @relation(fields: [studentId], references: [studentId])
+  classScheduleId  String           @map("class_schedule_id") @db.Uuid
+  classSchedule    ClassSchedule    @relation(fields: [classScheduleId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  enrollmentDate   DateTime         @default(now()) @map("enrollment_date")
+  status           EnrollmentStatus @default(NOT_ENROLLED)
+  finalGradeLetter String?          @map("final_grade_letter")
+  finalGradeScore  Float?           @map("final_grade_score")
+  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt        DateTime         @updatedAt @map("updated_at") @db.Timestamp()
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@id([studentId, classScheduleId]) // Primary Key Gabungan
+  @@id([studentId, classScheduleId])
   @@map("student_enrollments")
+}
+
+model Attendance {
+  id                             String           @id @default(uuid()) @map("id") @db.Uuid
+  studentId                      String           @map("student_id") @db.Uuid
+  student                        Student          @relation(fields: [studentId], references: [studentId])
+  classScheduleId                String           @map("class_schedule_id") @db.Uuid
+  classSchedule                  ClassSchedule    @relation(fields: [classScheduleId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  status                         AttendanceStatus @default(ABSENT) @map("status")
+  recordedAt                     DateTime         @default(now()) @map("recorded_at") @db.Timestamp(3)
+  notes                          String?          @map("notes") @db.Text
+  createdAt                      DateTime         @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt                      DateTime         @updatedAt @map("updated_at") @db.Timestamp()
+  ClassEnrollment                ClassEnrollment? @relation(fields: [classEnrollmentStudentId, classEnrollmentClassScheduleId], references: [studentId, classScheduleId])
+  classEnrollmentStudentId       String?          @db.Uuid
+  classEnrollmentClassScheduleId String?          @db.Uuid
+
+  @@unique([studentId, classScheduleId])
+  @@map("attendances")
+}
+
+model Employee {
+  userId       String           @id @map("user_id") @db.Uuid
+  user         User             @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  employeeCode String           @unique @map("employee_code")
+  position     String?          @map("position")
+  department   String?          @map("department")
+  hireDate     DateTime         @map("hire_date") @db.Date
+  status       EmploymentStatus @default(FULL_TIME) @map("status") // Good
+  createdAt    DateTime         @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt    DateTime         @updatedAt @map("updated_at") @db.Timestamp()
+
+  @@map("employees")
+}
+
+model GeneralSchedule {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @map("schedule_name")
+  description String?  @map("schedule_desc") @db.Text
+  type        String   @map("schedule_type")
+  startDate   DateTime @map("start_date") @db.Timestamp(3)
+  endDate     DateTime @map("end_date") @db.Timestamp(3)
+  location    String?  @map("activities_location")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamp()
+
+  @@map("general_schedules") // general_schedule -> general_schedules
+}
+
+model LecturersSchedule {
+  id              String         @id @default(uuid()) @db.Uuid
+  lecturerId      String         @map("lecturer_id") @db.Uuid
+  lecturer        Lecturer       @relation(fields: [lecturerId], references: [lecturerId])
+  type            String         @map("type_activities")
+  classScheduleId String?        @map("class_schedule_id") @db.Uuid
+  classSchedule   ClassSchedule? @relation(fields: [classScheduleId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  title           String?        @map("schedule_name")
+  description     String?        @map("schedule_desc") @db.Text
+  startDate       DateTime       @map("start_date") @db.Timestamp(3)
+  endDate         DateTime       @map("end_date") @db.Timestamp(3)
+  dayOfWeek       DayOfWeek?     @map("day_of_week")
+  location        String?        @map("activities_location")
+  createdAt       DateTime       @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt       DateTime       @updatedAt @map("updated_at") @db.Timestamp()
+
+  @@unique([lecturerId, startDate, endDate])
+  @@map("lecturers_schedules")
+}
+
+model AdmissionQuota {
+  id             String       @id @default(uuid()) @db.Uuid
+  academicYearId String       @map("academic_year_id") @db.Uuid
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  programId      String       @map("program_id") @db.Uuid
+  program        Programs     @relation(fields: [programId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  quota          Int          @map("quota_available")
+  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt      DateTime     @updatedAt @map("updated_at") @db.Timestamp()
+
+  @@map("admission_quotas")
+}
+
+model CourseEnrollment {
+  id             String           @id @default(uuid()) @map("id") @db.Uuid
+  studentId      String           @map("student_id") @db.Uuid
+  student        Student          @relation(fields: [studentId], references: [studentId])
+  courseId       String           @map("course_id") @db.Uuid
+  course         Courses          @relation(fields: [courseId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  semesterId     String           @map("semester_id") @db.Uuid
+  semester       Semester         @relation(fields: [semesterId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  enrollmentDate DateTime         @default(now()) @map("enrollment_date")
+  status         EnrollmentStatus @default(NOT_ENROLLED)
+  finalGrade     Float?           @map("final_grade")
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt      DateTime         @updatedAt @map("updated_at") @db.Timestamp()
+
+  @@unique([studentId, courseId, semesterId])
+  @@map("course_enrollments")
+}
+
+model ClassEnrollment {
+  studentId       String           @map("student_id") @db.Uuid
+  student         Student          @relation(fields: [studentId], references: [studentId], onUpdate: Cascade, onDelete: Cascade)
+  classScheduleId String           @map("class_schedule_id") @db.Uuid
+  classSchedule   ClassSchedule    @relation(fields: [classScheduleId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  classId         String           @map("class_id") @db.Uuid
+  class           Class            @relation(fields: [classId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  status          EnrollmentStatus @default(NOT_ENROLLED)
+  createdAt       DateTime         @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt       DateTime         @updatedAt @map("updated_at") @db.Timestamp()
+  attendances     Attendance[]
+
+  @@id([studentId, classScheduleId])
+  @@unique([studentId, classScheduleId])
+  @@map("class_enrollments")
+}
+
+model Class {
+  id               String            @id @default(uuid()) @db.Uuid
+  className        String            @map("class_name")
+  programId        String            @map("program_id") @db.Uuid
+  program          Programs          @relation(fields: [programId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  createdAt        DateTime          @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt        DateTime          @updatedAt @map("updated_at") @db.Timestamp()
+  classEnrollments ClassEnrollment[]
+
+  @@map("classes")
 }
