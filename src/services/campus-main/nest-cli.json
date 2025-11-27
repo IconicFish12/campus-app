@@ -3,6 +3,14 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "compilerOptions": {
-    "deleteOutDir": true
+    "webpack": false,
+    "watchAssets": true,
+    "deleteOutDir": true,
+    "assets": [
+      {
+        "include": "database/generated/campus_client",
+        "outDir": "dist/"
+      }
+    ]
   }
 }

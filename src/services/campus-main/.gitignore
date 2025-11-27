@@ -3,10 +3,6 @@
 /node_modules
 /build
 
-src/services/campus-lms/dist
-src/services/campus-lms/node_modules
-src/services/campus-lms/build
-
 src/services/campus-main/dist
 src/services/campus-main/node_modules
 src/services/campus-main/build
@@ -51,7 +47,7 @@ lerna-debug.log*
 .env.local
 
 # prismaORM
-src/services/**/generated
+src/database/generated
 
 # temp directory
 .temp

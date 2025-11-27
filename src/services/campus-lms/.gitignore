@@ -51,7 +51,7 @@ lerna-debug.log*
 .env.local
 
 # prismaORM
-src/services/**/generated
+src/database/generated
 
 # temp directory
 .temp
